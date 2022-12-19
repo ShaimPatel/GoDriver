@@ -101,10 +101,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
         "password": passwordTextEditingController.text.trim()
       };
 
-      DatabaseReference driverRef =
+      DatabaseReference userRef =
           FirebaseDatabase.instance.ref().child("Users");
 
-      driverRef.child(firebaseUser.uid).set(usersMap);
+      userRef.child(firebaseUser.uid).set(usersMap);
       currentFirebaseUser = firebaseUser;
       if (!mounted) return;
       Navigator.push(

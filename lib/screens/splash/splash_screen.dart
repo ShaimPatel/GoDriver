@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:users_app/assistant/assistant_methods.dart';
 import 'package:users_app/screens/Authentication/login_screen.dart';
 import 'package:users_app/screens/global/global.dart';
 import 'package:users_app/screens/mainScreens/main_screen.dart';
@@ -15,9 +16,13 @@ class MySplashScreen extends StatefulWidget {
 class _MySplashScreenState extends State<MySplashScreen> {
   //? Time
   void startTimer() {
+    firebaseAuth.currentUser != null
+        ? AssistantMethods.readCurrentOnLineInfo()
+        : null;
     Timer(const Duration(seconds: 3), () async {
       if (firebaseAuth.currentUser != null) {
         //!Send  user to home screen..!
+        AssistantMethods.readCurrentOnLineInfo();
         Navigator.push(
             context, MaterialPageRoute(builder: (c) => const MainScreen()));
       } else {

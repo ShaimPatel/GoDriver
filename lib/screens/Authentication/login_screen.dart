@@ -3,6 +3,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:users_app/screens/Authentication/signup_screen.dart';
+import 'package:users_app/screens/mainScreens/main_screen.dart';
 
 import '../../Widgets/progess_dialog.dart';
 import '../global/global.dart';
@@ -63,17 +64,29 @@ class _LoginScreenState extends State<LoginScreen> {
         .user;
 
     if (firebaseUser != null) {
-      DatabaseReference driverRef =
+      DatabaseReference userRef =
           FirebaseDatabase.instance.ref().child("Users");
 
-      currentFirebaseUser = firebaseUser;
-      if (!mounted) return;
-      Fluttertoast.showToast(msg: "Login Successful.");
+      userRef.child(firebaseUser.uid).once().then((userKey) {
+        final snap = userKey.snapshot;
+        if (snap.value != null) {
+          currentFirebaseUser = firebaseUser;
+          if (!mounted) return;
+          Fluttertoast.showToast(msg: "Login Successful.");
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (BuildContext ctx) => const MainScreen()));
+        } else {
+          Fluttertoast.showToast(msg: "No Record exist with this mail.");
 
-      Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (BuildContext ctx) => const MySplashScreen()));
+          firebaseAuth.signOut();
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (BuildContext ctx) => const MySplashScreen()));
+        }
+      });
     } else {
       if (!mounted) return;
       Navigator.of(context).pop();
