@@ -94,7 +94,7 @@ class MainScreenState extends State<MainScreen> {
       print(
           '${place.street}, ${place.subLocality}, ${place.subAdministrativeArea}, ${place.postalCode}');
     }).catchError((e) {
-      debugPrint(e);
+      debugPrint(e.toString());
     });
   }
 
