@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:video_player/video_player.dart';
 
 import '../Widgets/progess_dialog.dart';
 
@@ -66,14 +67,27 @@ class _LoginScreenState extends State<LoginScreen> {
       DatabaseReference driverRef =
           FirebaseDatabase.instance.ref().child("drivers");
 
-      currentFirebaseUser = firebaseUser;
-      if (!mounted) return;
-      Fluttertoast.showToast(msg: "Login Successful.");
+      driverRef.child(firebaseUser.uid).once().then((driverkey) {
+        final snap = driverkey.snapshot;
+        if (snap.value != null) {
+          currentFirebaseUser = firebaseUser;
+          if (!mounted) return;
+          Fluttertoast.showToast(msg: "Login Successful.");
 
-      Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (BuildContext ctx) => const MySplashScreen()));
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (BuildContext ctx) => const MySplashScreen()));
+        } else {
+          Fluttertoast.showToast(msg: "No Record exist with this mail.");
+
+          firebaseAuth.signOut();
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (BuildContext ctx) => const MySplashScreen()));
+        }
+      });
     } else {
       if (!mounted) return;
       Navigator.of(context).pop();
@@ -81,82 +95,118 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  late VideoPlayerController _controller;
+  @override
+  void initState() {
+    super.initState();
+    _controller = VideoPlayerController.asset("assets/vedio/login.mp4")
+      ..initialize().then((_) {
+        _controller.play();
+        _controller.setLooping(true);
+        setState(() {});
+      });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _controller.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const SizedBox(height: 10),
-              Padding(
-                  padding: const EdgeInsets.all(20),
-                  child: Image.asset("assets/images/logo1.png")),
-              const SizedBox(height: 10),
-              const Text("Login as a Driver",
-                  style: TextStyle(
-                      fontSize: 26,
-                      color: Colors.grey,
-                      fontWeight: FontWeight.bold)),
-              TextField(
-                controller: emailTextEditingController,
-                style: const TextStyle(color: Colors.grey),
-                keyboardType: TextInputType.emailAddress,
-                decoration: const InputDecoration(
-                  labelText: "E-mail",
-                  hintText: "Enter E-mail..!",
-                  enabledBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(color: Colors.grey)),
-                  focusedBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(color: Colors.grey)),
-                  hintStyle: TextStyle(color: Colors.grey, fontSize: 10),
-                  labelStyle: TextStyle(color: Colors.grey, fontSize: 14),
+      backgroundColor: Colors.white.withOpacity(1),
+      body: Stack(
+        children: [
+          SizedBox.expand(
+              child: FittedBox(
+            fit: BoxFit.fill,
+            child: SizedBox(
+              width: _controller.value.size.width,
+              height: _controller.value.size.height,
+              child: VideoPlayer(_controller),
+            ),
+          )),
+          SingleChildScrollView(
+            child: Container(
+              color: Colors.white.withOpacity(0.2),
+              height: MediaQuery.of(context).size.height,
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const SizedBox(height: 10),
+                    Padding(
+                        padding: const EdgeInsets.all(20),
+                        child: Image.asset("assets/images/logo1.png")),
+                    const SizedBox(height: 10),
+                    const Text("Login as a Driver",
+                        style: TextStyle(
+                            fontSize: 26,
+                            color: Colors.grey,
+                            fontWeight: FontWeight.bold)),
+                    TextField(
+                      controller: emailTextEditingController,
+                      style: const TextStyle(color: Colors.grey),
+                      keyboardType: TextInputType.emailAddress,
+                      decoration: const InputDecoration(
+                        labelText: "E-mail",
+                        hintText: "Enter E-mail..!",
+                        enabledBorder: UnderlineInputBorder(
+                            borderSide: BorderSide(color: Colors.grey)),
+                        focusedBorder: UnderlineInputBorder(
+                            borderSide: BorderSide(color: Colors.grey)),
+                        hintStyle: TextStyle(color: Colors.grey, fontSize: 10),
+                        labelStyle: TextStyle(color: Colors.grey, fontSize: 14),
+                      ),
+                    ),
+                    TextField(
+                      controller: passwordTextEditingController,
+                      style: const TextStyle(color: Colors.grey),
+                      keyboardType: TextInputType.text,
+                      obscureText: true,
+                      decoration: const InputDecoration(
+                        labelText: "Password",
+                        hintText: "Enter Password..!",
+                        enabledBorder: UnderlineInputBorder(
+                            borderSide: BorderSide(color: Colors.grey)),
+                        focusedBorder: UnderlineInputBorder(
+                            borderSide: BorderSide(color: Colors.grey)),
+                        hintStyle: TextStyle(color: Colors.grey, fontSize: 10),
+                        labelStyle: TextStyle(color: Colors.grey, fontSize: 14),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    ElevatedButton(
+                        onPressed: () {
+                          validateForm();
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.lightGreenAccent,
+                        ),
+                        child: const Text("Create Account",
+                            style: TextStyle(
+                                color: Colors.black54, fontSize: 18))),
+                    const SizedBox(height: 10),
+                    TextButton(
+                        onPressed: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const SignUpScreen()));
+                        },
+                        child: const Text(
+                          "Don't have a Account? Create Here..!",
+                          style: TextStyle(color: Colors.grey),
+                        ))
+                  ],
                 ),
               ),
-              TextField(
-                controller: passwordTextEditingController,
-                style: const TextStyle(color: Colors.grey),
-                keyboardType: TextInputType.text,
-                obscureText: true,
-                decoration: const InputDecoration(
-                  labelText: "Password",
-                  hintText: "Enter Password..!",
-                  enabledBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(color: Colors.grey)),
-                  focusedBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(color: Colors.grey)),
-                  hintStyle: TextStyle(color: Colors.grey, fontSize: 10),
-                  labelStyle: TextStyle(color: Colors.grey, fontSize: 14),
-                ),
-              ),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                  onPressed: () {
-                    validateForm();
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.lightGreenAccent,
-                  ),
-                  child: const Text("Create Account",
-                      style: TextStyle(color: Colors.black54, fontSize: 18))),
-              const SizedBox(height: 10),
-              TextButton(
-                  onPressed: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const SignUpScreen()));
-                  },
-                  child: const Text(
-                    "Don't have a Account? Create Here..!",
-                    style: TextStyle(color: Colors.grey),
-                  ))
-            ],
+            ),
           ),
-        ),
+        ],
       ),
     );
   }
