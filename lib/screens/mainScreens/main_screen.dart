@@ -3,6 +3,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -30,6 +31,16 @@ class MainScreenState extends State<MainScreen> {
   double searchLocationContainerHeight = 220;
   GlobalKey<ScaffoldState> skey = GlobalKey<ScaffoldState>();
   Position? userCurrantPosition;
+
+  List<LatLng> pLineCoOridinatesList = [];
+  Set<Polyline> polylineSet = {};
+  Set<Marker> markerSet = {};
+  Set<Circle> circleSet = {};
+
+  String userName = 'Your Name..!';
+  String userEmail = 'xyz@gmail.com';
+
+  bool openNavigationDrawer = true;
 
   static const CameraPosition _kGooglePlex = CameraPosition(
     target: LatLng(26.8467, 80.9462),
@@ -76,6 +87,8 @@ class MainScreenState extends State<MainScreen> {
         await AssistantMethods.searchAddressForGeographicCordinates(
             userCurrantPosition!, context);
 
+    userName = userModelCurrentInfo!.name!;
+    userEmail = userModelCurrentInfo!.email!;
     developer.log(humanReadableAddress);
 
     // _getAddressFromLatLng(cPosition);
@@ -294,8 +307,8 @@ class MainScreenState extends State<MainScreen> {
     return Scaffold(
         key: skey,
         drawer: MyDrawer(
-          name: userModelCurrentInfo?.name,
-          email: userModelCurrentInfo?.email,
+          name: userName,
+          email: userEmail,
         ),
         body: Stack(
           children: [
@@ -305,6 +318,9 @@ class MainScreenState extends State<MainScreen> {
               mapType: MapType.hybrid,
               zoomGesturesEnabled: true,
               zoomControlsEnabled: true,
+              markers: markerSet,
+              circles: circleSet,
+              polylines: polylineSet,
               initialCameraPosition: _kGooglePlex,
               onMapCreated: (GoogleMapController controller) {
                 _controller.complete(controller);
@@ -325,12 +341,24 @@ class MainScreenState extends State<MainScreen> {
               top: 40,
               child: GestureDetector(
                   onTap: () {
-                    skey.currentState!.openDrawer();
+                    if (openNavigationDrawer) {
+                      skey.currentState!.openDrawer();
+                    } else {
+                      //Restart the app..!
+                      setState(() {
+                        pLineCoOridinatesList.clear();
+                        polylineSet.clear();
+                        circleSet.clear();
+                        markerSet.clear();
+                        openNavigationDrawer = true;
+                      });
+                      // SystemNavigator.pop();
+                    }
                   },
-                  child: const CircleAvatar(
+                  child: CircleAvatar(
                     backgroundColor: Colors.black,
                     child: Icon(
-                      Icons.menu,
+                      openNavigationDrawer == true ? Icons.menu : Icons.close,
                       color: Colors.white,
                       size: 25,
                     ),
@@ -408,6 +436,9 @@ class MainScreenState extends State<MainScreen> {
                                   "obtainedDropoff") {
                                 //Draw Routes - draw polyline..
                                 await drawPolyLineFromOriginToDistination();
+                                setState(() {
+                                  openNavigationDrawer = false;
+                                });
                               }
                             },
                             child: Row(
@@ -493,7 +524,103 @@ class MainScreenState extends State<MainScreen> {
         await AssistantMethods.obtainedOriginToDestinationDetails(
             originLatLng, distinationLatLng);
     Navigator.pop(context);
+
+    //Print Value
     developer.log("These are points");
     developer.log(directionDetailsInfo!.encodedPoint.toString());
+
+    PolylinePoints polylinePoints = PolylinePoints();
+    List<PointLatLng> decodedPpointsResultList =
+        polylinePoints.decodePolyline(directionDetailsInfo.encodedPoint!);
+    pLineCoOridinatesList.clear();
+    if (decodedPpointsResultList.isNotEmpty) {
+      for (var pointLatLng in decodedPpointsResultList) {
+        pLineCoOridinatesList
+            .add(LatLng(pointLatLng.latitude, pointLatLng.longitude));
+      }
+    }
+
+    polylineSet.clear();
+
+    setState(() {
+      Polyline polyline = Polyline(
+        color: Colors.red,
+        polylineId: const PolylineId("PolylineID"),
+        jointType: JointType.round,
+        points: pLineCoOridinatesList,
+        startCap: Cap.roundCap,
+        endCap: Cap.roundCap,
+        geodesic: true,
+      );
+      polylineSet.add(polyline);
+    });
+
+    LatLngBounds latLagBound;
+    if (originLatLng.latitude > distinationLatLng.latitude &&
+        originLatLng.longitude > distinationLatLng.longitude) {
+      latLagBound =
+          LatLngBounds(southwest: distinationLatLng, northeast: originLatLng);
+    } else if (originLatLng.longitude > distinationLatLng.longitude) {
+      latLagBound = LatLngBounds(
+        southwest: LatLng(originLatLng.latitude, distinationLatLng.longitude),
+        northeast: LatLng(distinationLatLng.latitude, originLatLng.longitude),
+      );
+    } else if (originLatLng.latitude > distinationLatLng.latitude) {
+      latLagBound = LatLngBounds(
+        southwest: LatLng(distinationLatLng.latitude, originLatLng.longitude),
+        northeast: LatLng(originLatLng.latitude, distinationLatLng.longitude),
+      );
+    } else {
+      latLagBound =
+          LatLngBounds(southwest: originLatLng, northeast: distinationLatLng);
+    }
+    newGoogleMapController!
+        .animateCamera(CameraUpdate.newLatLngBounds(latLagBound, 65));
+
+    Marker originMarker = Marker(
+        markerId: const MarkerId("originID"),
+        infoWindow: InfoWindow(
+          title: originPostion.locationName,
+          snippet: "Origin",
+        ),
+        position: originLatLng,
+        icon:
+            BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueYellow));
+
+    Marker destinationMarker = Marker(
+        markerId: const MarkerId("destinationID"),
+        infoWindow: InfoWindow(
+          title: distinationPosition.locationName,
+          snippet: "Destination",
+        ),
+        position: distinationLatLng,
+        icon:
+            BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueOrange));
+
+    setState(() {
+      markerSet.add(originMarker);
+      markerSet.add(destinationMarker);
+    });
+
+    Circle originCircle = Circle(
+      circleId: const CircleId("originID"),
+      fillColor: Colors.green,
+      radius: 12,
+      strokeWidth: 3,
+      strokeColor: Colors.white,
+      center: originLatLng,
+    );
+    Circle destinationCircle = Circle(
+      circleId: const CircleId("distinationID"),
+      fillColor: Colors.red,
+      radius: 12,
+      strokeWidth: 3,
+      strokeColor: Colors.white,
+      center: distinationLatLng,
+    );
+    setState(() {
+      circleSet.add(originCircle);
+      circleSet.add(destinationCircle);
+    });
   }
 }
