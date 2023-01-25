@@ -45,7 +45,7 @@ class _MySplashScreenState extends State<MySplashScreen> {
               Image.asset("assets/images/logo1.png"),
               const SizedBox(height: 25),
               const Text(
-                "Uber & inDriver Clone App",
+                "Go Driver App",
                 style: TextStyle(
                   fontSize: 24,
                   color: Colors.white,

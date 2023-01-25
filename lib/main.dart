@@ -1,21 +1,26 @@
 // ignore_for_file: must_be_immutable
 
+import 'package:driver_app/InfoHandler/app_info.dart';
 import 'package:driver_app/screens/splash/splash_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   runApp(
     MyApp(
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        title: 'OLA',
-        theme: ThemeData(
-          primarySwatch: Colors.blue,
+      child: ChangeNotifierProvider(
+        create: (context) => AppInfo(),
+        child: MaterialApp(
+          debugShowCheckedModeBanner: false,
+          title: 'GoDriver',
+          theme: ThemeData(
+            primarySwatch: Colors.blue,
+          ),
+          home: const MySplashScreen(),
         ),
-        home: const MySplashScreen(),
       ),
     ),
   );

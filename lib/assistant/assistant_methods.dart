@@ -39,13 +39,13 @@ class AssistantMethods {
     currentFirebaseUser = FirebaseAuth.instance.currentUser;
     DatabaseReference userRef = FirebaseDatabase.instance
         .ref()
-        .child("Users")
+        .child("drivers")
         .child(currentFirebaseUser!.uid);
 
     userRef.once().then((snap) {
       if (snap.snapshot.value != null) {
-        userModelCurrentInfo = UserModel.fromSnapshot(snap.snapshot);
-        developer.log("name${userModelCurrentInfo!.name.toString()}");
+        driverModelCurrentInfo = DriverModel.fromSnapshot(snap.snapshot);
+        developer.log("name${driverModelCurrentInfo!.name.toString()}");
       }
     });
   }

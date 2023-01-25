@@ -1,7 +1,12 @@
 import 'dart:async';
 
 import 'package:driver_app/assistant/assistant_methods.dart';
+import 'package:driver_app/global/global.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_geofire/flutter_geofire.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
@@ -204,7 +209,7 @@ class _HomeTabPageState extends State<HomeTabPage> {
                 ''');
   }
 
-//! CheckLoaction Permission
+//todo: CheckLoaction Permission
   checkLocationPermission() async {
     _locationPermission = await Geolocator.requestPermission();
     if (_locationPermission == LocationPermission.denied) {
@@ -214,7 +219,7 @@ class _HomeTabPageState extends State<HomeTabPage> {
     }
   }
 
-  //!LocateUserLocation
+  //todo:LocateUserLocation
   locateDriverLocation() async {
     Position cPosition = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high);
@@ -261,7 +266,7 @@ class _HomeTabPageState extends State<HomeTabPage> {
             ? Container(
                 height: MediaQuery.of(context).size.height,
                 width: double.infinity,
-                color: Colors.black87,
+                color: Colors.black,
               )
             : Container(),
 
@@ -281,7 +286,30 @@ class _HomeTabPageState extends State<HomeTabPage> {
                         padding: const EdgeInsets.symmetric(horizontal: 26),
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(26))),
-                    onPressed: () {},
+                    onPressed: () {
+                      //! Calling The Method..
+
+                      if (isDriverActive != true) {
+                        driverIsOnlineNow();
+                        updateDriversLocationsRealTime();
+                        setState(() {
+                          statusText = "Now Online";
+                          isDriverActive = true;
+                          buttonsColor = Colors.transparent;
+                        });
+                        //Toast
+                        Fluttertoast.showToast(msg: "You are online now");
+                      } else {
+                        driverIsOfflineNow();
+
+                        setState(() {
+                          statusText = "Now Offline";
+                          isDriverActive = false;
+                          buttonsColor = Colors.grey;
+                        });
+                        Fluttertoast.showToast(msg: "You are offline now");
+                      }
+                    },
                     child: statusText != "Now Online"
                         ? Text(
                             statusText,
@@ -299,5 +327,60 @@ class _HomeTabPageState extends State<HomeTabPage> {
             )),
       ],
     );
+  }
+
+//todo: For Driver Online or Offline
+  driverIsOnlineNow() async {
+    Position pos = await Geolocator.getCurrentPosition(
+      desiredAccuracy: LocationAccuracy.high,
+    );
+    driverCurrantPosition = pos;
+    Geofire.initialize("activeDrivers");
+    Geofire.setLocation(
+      currentFirebaseUser!.uid,
+      driverCurrantPosition!.latitude,
+      driverCurrantPosition!.longitude,
+    );
+    DatabaseReference databaseref = FirebaseDatabase.instance
+        .ref()
+        .child("drivers")
+        .child(currentFirebaseUser!.uid)
+        .child("newRideStatus");
+//! Driver is Active and searching for ride request..
+    databaseref.set("idle");
+    databaseref.onValue.listen((event) {});
+  }
+
+  // //todo:
+  updateDriversLocationsRealTime() {
+    streamSubscription =
+        Geolocator.getPositionStream().listen((Position position) {
+      driverCurrantPosition = position;
+      if (isDriverActive == true) {
+        Geofire.setLocation(currentFirebaseUser!.uid,
+            driverCurrantPosition!.latitude, driverCurrantPosition!.longitude);
+      }
+      LatLng latLng = LatLng(
+          driverCurrantPosition!.latitude, driverCurrantPosition!.longitude);
+      newGoogleMapController!.animateCamera(CameraUpdate.newLatLng(latLng));
+    });
+  }
+
+  // todo:  Driver Offline
+
+  driverIsOfflineNow() {
+    Geofire.removeLocation(currentFirebaseUser!.uid);
+    DatabaseReference? reff = FirebaseDatabase.instance
+        .ref()
+        .child("drivers")
+        .child(currentFirebaseUser!.uid)
+        .child("newRideStatus");
+
+    reff.onDisconnect();
+    reff.remove();
+    reff = null;
+    Future.delayed(const Duration(milliseconds: 2000), () {
+      SystemChannels.platform.invokeMethod("SystemNavigator.pop");
+    });
   }
 }

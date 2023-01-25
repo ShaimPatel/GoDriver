@@ -1,11 +1,11 @@
 // To parse this JSON data, do
 //
-//     final userModel = userModelFromMap(jsonString);
+//     final DriverModel = DriverModelFromMap(jsonString);
 
 import 'package:firebase_database/firebase_database.dart';
 
-class UserModel {
-  UserModel({
+class DriverModel {
+  DriverModel({
     required this.id,
     required this.name,
     required this.phone,
@@ -17,7 +17,7 @@ class UserModel {
   String? phone;
   String? email;
 
-  UserModel.fromSnapshot(DataSnapshot snapshot) {
+  DriverModel.fromSnapshot(DataSnapshot snapshot) {
     name = (snapshot.value as dynamic)["name"];
     id = (snapshot.value as dynamic)["id"];
     email = (snapshot.value as dynamic)["email"];
@@ -25,7 +25,7 @@ class UserModel {
   }
 }
 
-//   factory UserModel.fromMap(Map<String, dynamic> json) => UserModel(
+//   factory DriverModel.fromMap(Map<String, dynamic> json) => DriverModel(
 //         id: json["id"],
 //         name: json["name"],
 //         phone: json["phone"],
