@@ -1,6 +1,8 @@
 import 'dart:async';
 
+import 'package:driver_app/assistant/assistant_methods.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class HomeTabPage extends StatefulWidget {
@@ -11,10 +13,18 @@ class HomeTabPage extends StatefulWidget {
 }
 
 class _HomeTabPageState extends State<HomeTabPage> {
-  //!
+  //! Initilization
+
+  String statusText = "Now Offline";
+  Color buttonsColor = Colors.grey;
+  bool isDriverActive = false;
   final Completer<GoogleMapController> _controller =
       Completer<GoogleMapController>();
+
   GoogleMapController? newGoogleMapController;
+  var geoLocator = Geolocator();
+  Position? driverCurrantPosition;
+  LocationPermission? _locationPermission;
 
   static const CameraPosition _kGooglePlex = CameraPosition(
     target: LatLng(26.8467, 80.9462),
@@ -194,20 +204,100 @@ class _HomeTabPageState extends State<HomeTabPage> {
                 ''');
   }
 
+//! CheckLoaction Permission
+  checkLocationPermission() async {
+    _locationPermission = await Geolocator.requestPermission();
+    if (_locationPermission == LocationPermission.denied) {
+      await Geolocator.requestPermission();
+    } else if (_locationPermission == LocationPermission.deniedForever) {
+      await Geolocator.requestPermission();
+    }
+  }
+
+  //!LocateUserLocation
+  locateDriverLocation() async {
+    Position cPosition = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
+    driverCurrantPosition = cPosition;
+    LatLng latLngPosition = LatLng(
+        driverCurrantPosition!.latitude, driverCurrantPosition!.longitude);
+    CameraPosition cameraPosition =
+        CameraPosition(target: latLngPosition, zoom: 14.0);
+    newGoogleMapController!
+        .animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
+
+    String humanReadableAddress =
+        // ignore: use_build_context_synchronously
+        await AssistantMethods.searchAddressForGeographicCordinates(
+            driverCurrantPosition!, context);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    checkLocationPermission();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        body: GoogleMap(
-      myLocationEnabled: true,
-      mapType: MapType.hybrid,
-      initialCameraPosition: _kGooglePlex,
-      onMapCreated: (GoogleMapController controller) {
-        _controller.complete(controller);
-        newGoogleMapController = controller;
+    return Stack(
+      children: [
+        GoogleMap(
+          myLocationEnabled: true,
+          mapType: MapType.hybrid,
+          initialCameraPosition: _kGooglePlex,
+          onMapCreated: (GoogleMapController controller) {
+            _controller.complete(controller);
+            newGoogleMapController = controller;
 
-        //todo:  black them
-        blackThemeGoogleMap();
-      },
-    ));
+            //todo:  black them
+            blackThemeGoogleMap();
+            locateDriverLocation();
+          },
+        ),
+
+        //todo: For Online or Offline..
+        statusText != "Now Online"
+            ? Container(
+                height: MediaQuery.of(context).size.height,
+                width: double.infinity,
+                color: Colors.black87,
+              )
+            : Container(),
+
+        //! Button for ofline and online..
+        Positioned(
+            top: statusText != "Now Online"
+                ? MediaQuery.of(context).size.height * 0.50
+                : 25,
+            left: 0,
+            right: 0,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                        backgroundColor: buttonsColor,
+                        padding: const EdgeInsets.symmetric(horizontal: 26),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(26))),
+                    onPressed: () {},
+                    child: statusText != "Now Online"
+                        ? Text(
+                            statusText,
+                            style: const TextStyle(
+                                fontSize: 16.0,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white),
+                          )
+                        : const Icon(
+                            Icons.phonelink_ring,
+                            color: Colors.white,
+                            size: 26,
+                          )),
+              ],
+            )),
+      ],
+    );
   }
 }
