@@ -1,11 +1,20 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:provider/provider.dart';
+import 'package:users_app/InfoHandler/app_info.dart';
 import 'package:users_app/Widgets/my_drawer.dart';
+import 'package:users_app/Widgets/progess_dialog.dart';
+import 'package:users_app/assistant/assistant_methods.dart';
 import 'package:users_app/screens/global/global.dart';
+import 'dart:developer' as developer;
+
+import 'package:users_app/screens/mainScreens/search_places_screen.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -15,25 +24,32 @@ class MainScreen extends StatefulWidget {
 }
 
 class MainScreenState extends State<MainScreen> {
-  //!
-  final Completer<GoogleMapController> _controller =
-      Completer<GoogleMapController>();
+  double? bottompaddingOfMap = 0.0;
+  var geoLocator = Geolocator();
   GoogleMapController? newGoogleMapController;
+  double searchLocationContainerHeight = 220;
+  GlobalKey<ScaffoldState> skey = GlobalKey<ScaffoldState>();
+  Position? userCurrantPosition;
 
   static const CameraPosition _kGooglePlex = CameraPosition(
     target: LatLng(26.8467, 80.9462),
     zoom: 14.4746,
   );
 
-  GlobalKey<ScaffoldState> skey = GlobalKey<ScaffoldState>();
-  double searchLocationContainerHeight = 220;
-  double? bottompaddingOfMap = 0.0;
-
-  Position? userCurrantLocation;
-  var geoLocator = Geolocator();
+  //!
+  final Completer<GoogleMapController> _controller =
+      Completer<GoogleMapController>();
 
   //! LocationPermission
   LocationPermission? _locationPermission;
+
+  @override
+  void initState() {
+    super.initState();
+    // AssistantMethods.readCurrentOnLineInfo();
+    checkLocationPermission();
+  }
+
   checkLocationPermission() async {
     _locationPermission = await Geolocator.requestPermission();
     if (_locationPermission == LocationPermission.denied) {
@@ -47,18 +63,26 @@ class MainScreenState extends State<MainScreen> {
   locateUserLocation() async {
     Position cPosition = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high);
-    userCurrantLocation = cPosition;
+    userCurrantPosition = cPosition;
     LatLng latLngPosition =
-        LatLng(userCurrantLocation!.latitude, userCurrantLocation!.longitude);
+        LatLng(userCurrantPosition!.latitude, userCurrantPosition!.longitude);
     CameraPosition cameraPosition =
         CameraPosition(target: latLngPosition, zoom: 14.0);
     newGoogleMapController!
         .animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
-    _getAddressFromLatLng(cPosition);
+
+    String humanReadableAddress =
+        // ignore: use_build_context_synchronously
+        await AssistantMethods.searchAddressForGeographicCordinates(
+            userCurrantPosition!, context);
+
+    developer.log(humanReadableAddress);
+
+    // _getAddressFromLatLng(cPosition);
 
     // try {
     //   List<Placemark> placemarks = await placemarkFromCoordinates(
-    //       userCurrantLocation!.latitude, userCurrantLocation!.longitude);
+    //       userCurrantPosition!.latitude, userCurrantPosition!.longitude);
 
     //   developer.log(
     //     "Country =>  ${placemarks.reversed.first.country}"
@@ -82,20 +106,6 @@ class MainScreenState extends State<MainScreen> {
     // } catch (e) {
     //   developer.log(e.toString());
     // }
-  }
-
-  //!....
-  Future<void> _getAddressFromLatLng(Position position) async {
-    await placemarkFromCoordinates(
-            userCurrantLocation!.latitude, userCurrantLocation!.longitude)
-        .then((List<Placemark> placemarks) {
-      Placemark place = placemarks[0];
-
-      print(
-          '${place.street}, ${place.subLocality}, ${place.subAdministrativeArea}, ${place.postalCode}');
-    }).catchError((e) {
-      debugPrint(e.toString());
-    });
   }
 
   //! Black Theme Google map
@@ -265,11 +275,18 @@ class MainScreenState extends State<MainScreen> {
                 ''');
   }
 
-  @override
-  void initState() {
-    super.initState();
-    // AssistantMethods.readCurrentOnLineInfo();
-    checkLocationPermission();
+  //!....
+  Future<void> _getAddressFromLatLng(Position position) async {
+    await placemarkFromCoordinates(
+            userCurrantPosition!.latitude, userCurrantPosition!.longitude)
+        .then((List<Placemark> placemarks) {
+      Placemark place = placemarks[0];
+
+      print(
+          '${place.street}, ${place.subLocality}, ${place.subAdministrativeArea}, ${place.postalCode}');
+    }).catchError((e) {
+      debugPrint(e.toString());
+    });
   }
 
   @override
@@ -348,16 +365,22 @@ class MainScreenState extends State<MainScreen> {
                               const SizedBox(width: 12.0),
                               Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: const [
-                                    Text(
+                                  children: [
+                                    const Text(
                                       "From",
                                       style: TextStyle(
                                           color: Colors.grey, fontSize: 12),
                                     ),
-                                    SizedBox(height: 3),
-                                    Text("Your Current Location",
+                                    const SizedBox(height: 3),
+                                    Text(
+                                        Provider.of<AppInfo>(context)
+                                                    .userPickUpLocation !=
+                                                null
+                                            ? "${(Provider.of<AppInfo>(context).userPickUpLocation!.locationName!).substring(0, 30)}.."
+                                            : "Not getting Address",
+                                        maxLines: 1,
                                         overflow: TextOverflow.ellipsis,
-                                        style: TextStyle(
+                                        style: const TextStyle(
                                             color: Colors.grey, fontSize: 14))
                                   ])
                             ],
@@ -371,31 +394,54 @@ class MainScreenState extends State<MainScreen> {
                           ),
                           const SizedBox(height: 10),
 
-                          Row(
-                            children: [
-                              const Icon(Icons.add_location_alt_outlined,
-                                  color: Colors.grey),
-                              const SizedBox(width: 12.0),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: const [
-                                  Text(
-                                    "Where to",
-                                    style: TextStyle(
-                                        color: Colors.grey, fontSize: 12),
-                                  ),
-                                  SizedBox(height: 3),
-                                  Text(
-                                    "Your Destination Location",
-                                    overflow: TextOverflow.ellipsis,
-                                    style: TextStyle(
-                                      color: Colors.grey,
-                                      fontSize: 14,
+                          GestureDetector(
+                            onTap: () async {
+                              //! Go to seaech place screen
+                              var responseFromSearchScreen =
+                                  await Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (c) =>
+                                              const SearchPlacesScreen()));
+
+                              if (responseFromSearchScreen ==
+                                  "obtainedDropoff") {
+                                //Draw Routes - draw polyline..
+                                await drawPolyLineFromOriginToDistination();
+                              }
+                            },
+                            child: Row(
+                              children: [
+                                const Icon(Icons.add_location_alt_outlined,
+                                    color: Colors.grey),
+                                const SizedBox(width: 12.0),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Text(
+                                      "Where to",
+                                      style: TextStyle(
+                                          color: Colors.grey, fontSize: 12),
                                     ),
-                                  ),
-                                ],
-                              ),
-                            ],
+                                    const SizedBox(height: 3),
+                                    Text(
+                                      Provider.of<AppInfo>(context)
+                                                  .userDropOffLocation !=
+                                              null
+                                          ? Provider.of<AppInfo>(context)
+                                              .userDropOffLocation!
+                                              .locationName!
+                                          : "Your Destination Location",
+                                      overflow: TextOverflow.ellipsis,
+                                      style: const TextStyle(
+                                        color: Colors.grey,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
                           ),
                           const SizedBox(height: 5),
                           const Divider(
@@ -425,5 +471,29 @@ class MainScreenState extends State<MainScreen> {
                 ))
           ],
         ));
+  }
+
+  //! Here are drawPolyLineFromSourceToDistination
+  Future<void> drawPolyLineFromOriginToDistination() async {
+    var originPostion =
+        Provider.of<AppInfo>(context, listen: false).userPickUpLocation;
+    var distinationPosition =
+        Provider.of<AppInfo>(context, listen: false).userDropOffLocation;
+    var originLatLng = LatLng(
+        originPostion!.locationLatitude!, originPostion.locationLongitude!);
+    var distinationLatLng = LatLng(distinationPosition!.locationLatitude!,
+        distinationPosition.locationLongitude!);
+
+    showDialog(
+        context: context,
+        builder: (BuildContext ctx) =>
+            const ProgressDialogWidget(message: "Please Wait"));
+
+    var directionDetailsInfo =
+        await AssistantMethods.obtainedOriginToDestinationDetails(
+            originLatLng, distinationLatLng);
+    Navigator.pop(context);
+    developer.log("These are points");
+    developer.log(directionDetailsInfo!.encodedPoint.toString());
   }
 }
