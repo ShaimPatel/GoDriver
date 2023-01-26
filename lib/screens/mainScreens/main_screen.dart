@@ -3,6 +3,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_geofire/flutter_geofire.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
@@ -12,6 +13,8 @@ import 'package:users_app/InfoHandler/app_info.dart';
 import 'package:users_app/Widgets/my_drawer.dart';
 import 'package:users_app/Widgets/progess_dialog.dart';
 import 'package:users_app/assistant/assistant_methods.dart';
+import 'package:users_app/assistant/grofire_assistant.dart';
+import 'package:users_app/models/active_nearby_avilable_drivers.dart';
 import 'package:users_app/screens/global/global.dart';
 import 'dart:developer' as developer;
 
@@ -39,7 +42,7 @@ class MainScreenState extends State<MainScreen> {
 
   String userName = 'Your Name..!';
   String userEmail = 'xyz@gmail.com';
-
+  bool activeNearbyDriverKeysLoded = false;
   bool openNavigationDrawer = true;
 
   static const CameraPosition _kGooglePlex = CameraPosition(
@@ -61,6 +64,81 @@ class MainScreenState extends State<MainScreen> {
     checkLocationPermission();
   }
 
+  //!..
+  displayActiveDriversOnUserApp() {
+    setState(() {
+      markerSet.clear();
+      circleSet.clear();
+      Set<Marker> driverMarkerSet = <Marker>{};
+
+      for (ActiveNearbyAvilableDrivers eachDriver
+          in GeoFireAssistant.activeNearbyAvilableDriversList) {
+        LatLng eachDriverActivePosition =
+            LatLng(eachDriver.locationLatitude!, eachDriver.locationLongitude!);
+        Marker marker = Marker(
+          markerId: MarkerId(eachDriver.driverID!),
+          position: eachDriverActivePosition,
+          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRose),
+          rotation: 360,
+        );
+
+        driverMarkerSet.add(marker);
+      }
+      setState(() {
+        markerSet = driverMarkerSet;
+      });
+    });
+  }
+
+  // initilization GeoFire
+  initalizationGeoFireListener() {
+    Geofire.initialize("activeDrivers");
+    Geofire.queryAtLocation(
+            userCurrantPosition!.altitude, userCurrantPosition!.longitude, 3)!
+        .listen((map) {
+      if (map != null) {
+        var callBack = map['callBack'];
+        switch (callBack) {
+          //Whenever Any Driver become active-online
+          case Geofire.onKeyEntered:
+            ActiveNearbyAvilableDrivers activeNearbyAvilableDriver =
+                ActiveNearbyAvilableDrivers();
+            activeNearbyAvilableDriver.locationLatitude = map['latitude'];
+            activeNearbyAvilableDriver.locationLongitude = map['longitude'];
+            activeNearbyAvilableDriver.driverID = map['key'];
+            GeoFireAssistant.activeNearbyAvilableDriversList
+                .add(activeNearbyAvilableDriver);
+            if (activeNearbyDriverKeysLoded == true) {
+              displayActiveDriversOnUserApp();
+            }
+            break;
+          //Whenever any driver become offline..
+          case Geofire.onKeyExited:
+            GeoFireAssistant.deleteOfflineDriverFromList(map['key']);
+            break;
+          //whenever driver move
+          case Geofire.onKeyMoved:
+            ActiveNearbyAvilableDrivers activeNearbyAvilableDriver =
+                ActiveNearbyAvilableDrivers();
+            activeNearbyAvilableDriver.locationLatitude = map['latitude'];
+            activeNearbyAvilableDriver.locationLongitude = map['longitude'];
+            activeNearbyAvilableDriver.driverID = map['key'];
+            GeoFireAssistant.updateActiveNearbyAvailableDriverLocation(
+                activeNearbyAvilableDriver);
+            displayActiveDriversOnUserApp();
+            break;
+          //display those online/active driver on user app..
+          case Geofire.onGeoQueryReady:
+            displayActiveDriversOnUserApp();
+            break;
+        }
+      }
+
+      setState(() {});
+    });
+  }
+
+//Permission Checking...
   checkLocationPermission() async {
     _locationPermission = await Geolocator.requestPermission();
     if (_locationPermission == LocationPermission.denied) {
@@ -83,7 +161,6 @@ class MainScreenState extends State<MainScreen> {
         .animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
 
     String humanReadableAddress =
-        // ignore: use_build_context_synchronously
         await AssistantMethods.searchAddressForGeographicCordinates(
             userCurrantPosition!, context);
 
@@ -91,34 +168,7 @@ class MainScreenState extends State<MainScreen> {
     userEmail = userModelCurrentInfo!.email!;
     developer.log(humanReadableAddress);
 
-    // _getAddressFromLatLng(cPosition);
-
-    // try {
-    //   List<Placemark> placemarks = await placemarkFromCoordinates(
-    //       userCurrantPosition!.latitude, userCurrantPosition!.longitude);
-
-    //   developer.log(
-    //     "Country =>  ${placemarks.reversed.first.country}"
-    //     "  "
-    //     "Name => ${placemarks.reversed.first.name}",
-    //   );
-    //   developer.log(
-    //     "locality =>  ${placemarks.reversed.first.locality}"
-    //     "  "
-    //     "postalCode => ${placemarks.reversed.first.postalCode}",
-    //   );
-    //   developer.log("street =>  ${placemarks[0].street.toString()}"
-    //       "  ");
-    //   developer.log(
-    //     "subLocality =>  ${placemarks.reversed.first.subLocality}"
-    //     "  "
-    //     "subThoroughfare => ${placemarks.reversed.first.subThoroughfare}",
-    //   );
-    //   developer.log("thoroughfare =>  ${placemarks.reversed.first.thoroughfare}"
-    //       "  ");
-    // } catch (e) {
-    //   developer.log(e.toString());
-    // }
+    initalizationGeoFireListener();
   }
 
   //! Black Theme Google map
@@ -288,7 +338,7 @@ class MainScreenState extends State<MainScreen> {
                 ''');
   }
 
-  //!....
+  //!...._getAddressFromLatLng
   Future<void> _getAddressFromLatLng(Position position) async {
     await placemarkFromCoordinates(
             userCurrantPosition!.latitude, userCurrantPosition!.longitude)
