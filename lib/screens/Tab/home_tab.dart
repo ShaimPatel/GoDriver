@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:async';
 
 import 'package:driver_app/assistant/assistant_methods.dart';
@@ -35,12 +37,6 @@ class _HomeTabPageState extends State<HomeTabPage> {
     target: LatLng(26.8467, 80.9462),
     zoom: 14.4746,
   );
-
-  static const CameraPosition _kLake = CameraPosition(
-      bearing: 192.8334901395799,
-      target: LatLng(37.43296265331129, -122.08832357078792),
-      tilt: 59.440717697143555,
-      zoom: 19.151926040649414);
 
   //! Black Theme Google map
   blackThemeGoogleMap() {
@@ -231,8 +227,8 @@ class _HomeTabPageState extends State<HomeTabPage> {
     newGoogleMapController!
         .animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
 
+    // ignore: unused_local_variable
     String humanReadableAddress =
-        // ignore: use_build_context_synchronously
         await AssistantMethods.searchAddressForGeographicCordinates(
             driverCurrantPosition!, context);
   }
