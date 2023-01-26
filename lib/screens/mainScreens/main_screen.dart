@@ -13,7 +13,7 @@ import 'package:users_app/InfoHandler/app_info.dart';
 import 'package:users_app/Widgets/my_drawer.dart';
 import 'package:users_app/Widgets/progess_dialog.dart';
 import 'package:users_app/assistant/assistant_methods.dart';
-import 'package:users_app/assistant/grofire_assistant.dart';
+import 'package:users_app/assistant/geofire_assistant.dart';
 import 'package:users_app/models/active_nearby_avilable_drivers.dart';
 import 'package:users_app/screens/global/global.dart';
 import 'dart:developer' as developer;
@@ -45,6 +45,8 @@ class MainScreenState extends State<MainScreen> {
   bool activeNearbyDriverKeysLoded = false;
   bool openNavigationDrawer = true;
 
+  BitmapDescriptor? activeNearbyIcon;
+
   static const CameraPosition _kGooglePlex = CameraPosition(
     target: LatLng(26.8467, 80.9462),
     zoom: 14.4746,
@@ -64,7 +66,7 @@ class MainScreenState extends State<MainScreen> {
     checkLocationPermission();
   }
 
-  //!..
+//todo-> .. Here are Display Active drive on User Map Icon..
   displayActiveDriversOnUserApp() {
     setState(() {
       markerSet.clear();
@@ -76,9 +78,9 @@ class MainScreenState extends State<MainScreen> {
         LatLng eachDriverActivePosition =
             LatLng(eachDriver.locationLatitude!, eachDriver.locationLongitude!);
         Marker marker = Marker(
-          markerId: MarkerId(eachDriver.driverID!),
+          markerId: MarkerId("Driver${eachDriver.driverID!}"),
           position: eachDriverActivePosition,
-          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRose),
+          icon: activeNearbyIcon!,
           rotation: 360,
         );
 
@@ -90,11 +92,11 @@ class MainScreenState extends State<MainScreen> {
     });
   }
 
-  // initilization GeoFire
+//todo:-> initilization GeoFire to Upadte Driver Location
   initalizationGeoFireListener() {
     Geofire.initialize("activeDrivers");
     Geofire.queryAtLocation(
-            userCurrantPosition!.altitude, userCurrantPosition!.longitude, 3)!
+            userCurrantPosition!.latitude, userCurrantPosition!.longitude, 10)!
         .listen((map) {
       if (map != null) {
         var callBack = map['callBack'];
@@ -115,6 +117,7 @@ class MainScreenState extends State<MainScreen> {
           //Whenever any driver become offline..
           case Geofire.onKeyExited:
             GeoFireAssistant.deleteOfflineDriverFromList(map['key']);
+            displayActiveDriversOnUserApp();
             break;
           //whenever driver move
           case Geofire.onKeyMoved:
@@ -129,6 +132,7 @@ class MainScreenState extends State<MainScreen> {
             break;
           //display those online/active driver on user app..
           case Geofire.onGeoQueryReady:
+            activeNearbyDriverKeysLoded = true;
             displayActiveDriversOnUserApp();
             break;
         }
@@ -354,6 +358,7 @@ class MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
+    createActiveDriverIconMarker();
     return Scaffold(
         key: skey,
         drawer: MyDrawer(
@@ -672,5 +677,20 @@ class MainScreenState extends State<MainScreen> {
       circleSet.add(originCircle);
       circleSet.add(destinationCircle);
     });
+  }
+
+  //! createActiveDriverIconMarker
+  createActiveDriverIconMarker() {
+    if (activeNearbyIcon == null) {
+      ImageConfiguration imageConfiguration = createLocalImageConfiguration(
+        context,
+        size: const Size(2, 2),
+      );
+      BitmapDescriptor.fromAssetImage(
+              imageConfiguration, "assets/images/car.png")
+          .then((value) {
+        activeNearbyIcon = value;
+      });
+    }
   }
 }
