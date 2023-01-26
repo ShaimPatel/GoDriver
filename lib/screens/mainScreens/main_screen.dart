@@ -2,9 +2,11 @@
 
 import 'dart:async';
 
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_geofire/flutter_geofire.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -19,6 +21,7 @@ import 'package:users_app/screens/global/global.dart';
 import 'dart:developer' as developer;
 
 import 'package:users_app/screens/mainScreens/search_places_screen.dart';
+import 'package:users_app/screens/mainScreens/select_nearest_active_driver_screen.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -46,6 +49,7 @@ class MainScreenState extends State<MainScreen> {
   bool openNavigationDrawer = true;
 
   BitmapDescriptor? activeNearbyIcon;
+  List<ActiveNearbyAvilableDrivers> onlineNearbyAvailableDriversList = [];
 
   static const CameraPosition _kGooglePlex = CameraPosition(
     target: LatLng(26.8467, 80.9462),
@@ -545,7 +549,16 @@ class MainScreenState extends State<MainScreen> {
                                   borderRadius:
                                       BorderRadius.all(Radius.circular(10))),
                             ),
-                            onPressed: () {},
+                            onPressed: () {
+                              if (Provider.of<AppInfo>(context, listen: false)
+                                      .userDropOffLocation !=
+                                  null) {
+                                saveRideRequestInformation();
+                              } else {
+                                Fluttertoast.showToast(
+                                    msg: "Please select destination ");
+                              }
+                            },
                             child: Text(
                               "Request a ride".toUpperCase(),
                             ),
@@ -559,7 +572,7 @@ class MainScreenState extends State<MainScreen> {
         ));
   }
 
-  //! Here are drawPolyLineFromSourceToDistination
+//todo:-> Here are drawPolyLineFromSourceToDistination
   Future<void> drawPolyLineFromOriginToDistination() async {
     var originPostion =
         Provider.of<AppInfo>(context, listen: false).userPickUpLocation;
@@ -679,7 +692,7 @@ class MainScreenState extends State<MainScreen> {
     });
   }
 
-  //! createActiveDriverIconMarker
+//todo:->  createActiveDriverIconMarker
   createActiveDriverIconMarker() {
     if (activeNearbyIcon == null) {
       ImageConfiguration imageConfiguration = createLocalImageConfiguration(
@@ -690,6 +703,52 @@ class MainScreenState extends State<MainScreen> {
               imageConfiguration, "assets/images/car.png")
           .then((value) {
         activeNearbyIcon = value;
+      });
+    }
+  }
+
+//todo:->  Save Ride Request Infromation ..
+  saveRideRequestInformation() {
+    onlineNearbyAvailableDriversList =
+        GeoFireAssistant.activeNearbyAvilableDriversList;
+    searchNearstOnlineDrivers();
+  }
+
+  searchNearstOnlineDrivers() async {
+    //? No Active Driver Then work this
+    if (onlineNearbyAvailableDriversList.isEmpty) {
+      //Cancle the ride Request..
+
+      setState(() {
+        polylineSet.clear();
+        markerSet.clear();
+        circleSet.clear();
+        pLineCoOridinatesList.clear();
+        openNavigationDrawer = true;
+      });
+
+      Fluttertoast.showToast(msg: "No Online Nearest Driver Avaliable.!");
+      return;
+    }
+
+    await retriveOnlineDriveInfo(onlineNearbyAvailableDriversList);
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (c) => const SelectNearestActiveDriversScreen()));
+  }
+
+//todo: When Driver are Active
+  retriveOnlineDriveInfo(List onlineNearestDriversList) async {
+    DatabaseReference ref = FirebaseDatabase.instance.ref().child("drivers");
+    for (var i = 0; i < onlineNearestDriversList.length; i++) {
+      await ref
+          .child(onlineNearestDriversList[i].driverID.toString())
+          .once()
+          .then((dataSnapshot) {
+        var driverInfoKey = dataSnapshot.snapshot.value;
+        dList.add(driverInfoKey);
+        developer.log("DriversKey Information$dList");
       });
     }
   }
