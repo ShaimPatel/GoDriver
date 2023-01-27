@@ -31,46 +31,46 @@ class MainScreen extends StatefulWidget {
 }
 
 class MainScreenState extends State<MainScreen> {
+//! Initilazation Section...****
+
   double? bottompaddingOfMap = 0.0;
+
   var geoLocator = Geolocator();
-  GoogleMapController? newGoogleMapController;
   double searchLocationContainerHeight = 220;
-  GlobalKey<ScaffoldState> skey = GlobalKey<ScaffoldState>();
-  Position? userCurrantPosition;
 
   List<LatLng> pLineCoOridinatesList = [];
+  List<ActiveNearbyAvilableDrivers> onlineNearbyAvailableDriversList = [];
   Set<Polyline> polylineSet = {};
   Set<Marker> markerSet = {};
   Set<Circle> circleSet = {};
+  GlobalKey<ScaffoldState> skey = GlobalKey<ScaffoldState>();
 
   String userName = 'Your Name..!';
   String userEmail = 'xyz@gmail.com';
   bool activeNearbyDriverKeysLoded = false;
   bool openNavigationDrawer = true;
 
+  GoogleMapController? newGoogleMapController;
   BitmapDescriptor? activeNearbyIcon;
-  List<ActiveNearbyAvilableDrivers> onlineNearbyAvailableDriversList = [];
-
   DatabaseReference? referenceRideRequest;
+  LocationPermission? _locationPermission;
+  Position? userCurrantPosition;
 
-  static const CameraPosition _kGooglePlex = CameraPosition(
-    target: LatLng(26.8467, 80.9462),
-    zoom: 14.4746,
-  );
+  static const CameraPosition _kGooglePlex =
+      CameraPosition(target: LatLng(26.8467, 80.9462), zoom: 14.4746);
 
-  //!
   final Completer<GoogleMapController> _controller =
       Completer<GoogleMapController>();
 
-  //! LocationPermission
-  LocationPermission? _locationPermission;
-
+//! InitState Section...****
   @override
   void initState() {
     super.initState();
     // AssistantMethods.readCurrentOnLineInfo();
     checkLocationPermission();
   }
+
+//! Funcation/Method Section....*
 
 //todo-> .. Here are Display Active drive on User Map Icon..
   displayActiveDriversOnUserApp() {
@@ -148,7 +148,7 @@ class MainScreenState extends State<MainScreen> {
     });
   }
 
-//Permission Checking...
+//todo:-> Permission Checking...
   checkLocationPermission() async {
     _locationPermission = await Geolocator.requestPermission();
     if (_locationPermission == LocationPermission.denied) {
@@ -158,7 +158,7 @@ class MainScreenState extends State<MainScreen> {
     }
   }
 
-  //!LocateUserLocation
+//todo :-> LocateUserLocation
   locateUserLocation() async {
     Position cPosition = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high);
@@ -181,7 +181,7 @@ class MainScreenState extends State<MainScreen> {
     initalizationGeoFireListener();
   }
 
-  //! Black Theme Google map
+//todo: ->  Black Theme Google map
   blackThemeGoogleMap() {
     newGoogleMapController!.setMapStyle('''
                     [
@@ -348,7 +348,7 @@ class MainScreenState extends State<MainScreen> {
                 ''');
   }
 
-  //!...._getAddressFromLatLng
+//todo: -> _getAddressFromLatLng
   Future<void> _getAddressFromLatLng(Position position) async {
     await placemarkFromCoordinates(
             userCurrantPosition!.latitude, userCurrantPosition!.longitude)
@@ -360,219 +360,6 @@ class MainScreenState extends State<MainScreen> {
     }).catchError((e) {
       debugPrint(e.toString());
     });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    createActiveDriverIconMarker();
-    return Scaffold(
-        key: skey,
-        drawer: MyDrawer(
-          name: userName,
-          email: userEmail,
-        ),
-        body: Stack(
-          children: [
-            GoogleMap(
-              padding: EdgeInsets.only(bottom: bottompaddingOfMap!),
-              myLocationEnabled: true,
-              mapType: MapType.hybrid,
-              zoomGesturesEnabled: true,
-              zoomControlsEnabled: true,
-              markers: markerSet,
-              circles: circleSet,
-              polylines: polylineSet,
-              initialCameraPosition: _kGooglePlex,
-              onMapCreated: (GoogleMapController controller) {
-                _controller.complete(controller);
-                newGoogleMapController = controller;
-
-                //todo:  black them
-                blackThemeGoogleMap();
-                setState(() {
-                  bottompaddingOfMap = 230;
-                });
-                locateUserLocation();
-              },
-            ),
-            //Add a draver button ..
-
-            Positioned(
-              left: 22,
-              top: 40,
-              child: GestureDetector(
-                  onTap: () {
-                    if (openNavigationDrawer) {
-                      skey.currentState!.openDrawer();
-                    } else {
-                      //Restart the app..!
-                      setState(() {
-                        pLineCoOridinatesList.clear();
-                        polylineSet.clear();
-                        circleSet.clear();
-                        markerSet.clear();
-                        openNavigationDrawer = true;
-                      });
-                      // SystemNavigator.pop();
-                    }
-                  },
-                  child: CircleAvatar(
-                    backgroundColor: Colors.black,
-                    child: Icon(
-                      openNavigationDrawer == true ? Icons.menu : Icons.close,
-                      color: Colors.white,
-                      size: 25,
-                    ),
-                  )),
-            ),
-
-            //todo: Searching Ui Location..
-            Positioned(
-                bottom: 0,
-                left: 0,
-                right: 0,
-                child: AnimatedSize(
-                  curve: Curves.decelerate,
-                  duration: const Duration(milliseconds: 120),
-                  child: Container(
-                    height: searchLocationContainerHeight,
-                    decoration: const BoxDecoration(
-                        color: Colors.black54,
-                        borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(20),
-                            topRight: Radius.circular(20))),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 24, vertical: 18),
-                      child: Column(
-                        children: [
-                          //todo:  from Location..
-                          Row(
-                            children: [
-                              const Icon(Icons.add_location_alt_outlined,
-                                  color: Colors.grey),
-                              const SizedBox(width: 12.0),
-                              Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    const Text(
-                                      "From",
-                                      style: TextStyle(
-                                          color: Colors.grey, fontSize: 12),
-                                    ),
-                                    const SizedBox(height: 3),
-                                    Text(
-                                        Provider.of<AppInfo>(context)
-                                                    .userPickUpLocation !=
-                                                null
-                                            ? "${(Provider.of<AppInfo>(context, listen: false).userPickUpLocation!.locationName!).substring(0, 30)}.."
-                                            : "Not getting Address",
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: const TextStyle(
-                                            color: Colors.grey, fontSize: 14))
-                                  ])
-                            ],
-                          ),
-                          const SizedBox(height: 15),
-                          const Divider(
-                            indent: 30,
-                            height: 1,
-                            thickness: 1,
-                            color: Colors.grey,
-                          ),
-                          const SizedBox(height: 10),
-
-                          GestureDetector(
-                            onTap: () async {
-                              //! Go to seaech place screen
-                              var responseFromSearchScreen =
-                                  await Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (c) =>
-                                              const SearchPlacesScreen()));
-
-                              if (responseFromSearchScreen ==
-                                  "obtainedDropoff") {
-                                //Draw Routes - draw polyline..
-                                await drawPolyLineFromOriginToDistination();
-                                setState(() {
-                                  openNavigationDrawer = false;
-                                });
-                              }
-                            },
-                            child: Row(
-                              children: [
-                                const Icon(Icons.add_location_alt_outlined,
-                                    color: Colors.grey),
-                                const SizedBox(width: 12.0),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    const Text(
-                                      "Where to",
-                                      style: TextStyle(
-                                          color: Colors.grey, fontSize: 12),
-                                    ),
-                                    const SizedBox(height: 3),
-                                    Text(
-                                      Provider.of<AppInfo>(context)
-                                                  .userDropOffLocation !=
-                                              null
-                                          ? Provider.of<AppInfo>(context,
-                                                  listen: false)
-                                              .userDropOffLocation!
-                                              .locationName!
-                                          : "Your Destination Location",
-                                      overflow: TextOverflow.ellipsis,
-                                      style: const TextStyle(
-                                        color: Colors.grey,
-                                        fontSize: 14,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 5),
-                          const Divider(
-                            indent: 30,
-                            height: 1,
-                            thickness: 1,
-                            color: Colors.grey,
-                          ),
-                          const SizedBox(height: 10),
-                          ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.green,
-                              textStyle: const TextStyle(fontSize: 16),
-                              shape: const RoundedRectangleBorder(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(10))),
-                            ),
-                            onPressed: () {
-                              if (Provider.of<AppInfo>(context, listen: false)
-                                      .userDropOffLocation !=
-                                  null) {
-                                saveRideRequestInformation();
-                              } else {
-                                Fluttertoast.showToast(
-                                    msg: "Please select destination ");
-                              }
-                            },
-                            child: Text(
-                              "Request a ride".toUpperCase(),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ))
-          ],
-        ));
   }
 
 //todo:-> Here are drawPolyLineFromSourceToDistination
@@ -794,5 +581,219 @@ class MainScreenState extends State<MainScreen> {
         developer.log("DriversKey Information$dList");
       });
     }
+  }
+
+//! UI Section...*****
+  @override
+  Widget build(BuildContext context) {
+    createActiveDriverIconMarker();
+    return Scaffold(
+        key: skey,
+        drawer: MyDrawer(
+          name: userName,
+          email: userEmail,
+        ),
+        body: Stack(
+          children: [
+            GoogleMap(
+              padding: EdgeInsets.only(bottom: bottompaddingOfMap!),
+              myLocationEnabled: true,
+              mapType: MapType.hybrid,
+              zoomGesturesEnabled: true,
+              zoomControlsEnabled: true,
+              markers: markerSet,
+              circles: circleSet,
+              polylines: polylineSet,
+              initialCameraPosition: _kGooglePlex,
+              onMapCreated: (GoogleMapController controller) {
+                _controller.complete(controller);
+                newGoogleMapController = controller;
+
+                //todo:  black them
+                blackThemeGoogleMap();
+                setState(() {
+                  bottompaddingOfMap = 230;
+                });
+                locateUserLocation();
+              },
+            ),
+            //Add a draver button ..
+
+            Positioned(
+              left: 22,
+              top: 40,
+              child: GestureDetector(
+                  onTap: () {
+                    if (openNavigationDrawer) {
+                      skey.currentState!.openDrawer();
+                    } else {
+                      //Restart the app..!
+                      setState(() {
+                        pLineCoOridinatesList.clear();
+                        polylineSet.clear();
+                        circleSet.clear();
+                        markerSet.clear();
+                        openNavigationDrawer = true;
+                      });
+                      // SystemNavigator.pop();
+                    }
+                  },
+                  child: CircleAvatar(
+                    backgroundColor: Colors.black,
+                    child: Icon(
+                      openNavigationDrawer == true ? Icons.menu : Icons.close,
+                      color: Colors.white,
+                      size: 25,
+                    ),
+                  )),
+            ),
+
+            //todo: Searching Ui Location..
+            Positioned(
+                bottom: 0,
+                left: 0,
+                right: 0,
+                child: AnimatedSize(
+                  curve: Curves.decelerate,
+                  duration: const Duration(milliseconds: 120),
+                  child: Container(
+                    height: searchLocationContainerHeight,
+                    decoration: const BoxDecoration(
+                        color: Colors.black54,
+                        borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(20),
+                            topRight: Radius.circular(20))),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 24, vertical: 18),
+                      child: Column(
+                        children: [
+                          //todo:  from Location..
+                          Row(
+                            children: [
+                              const Icon(Icons.add_location_alt_outlined,
+                                  color: Colors.grey),
+                              const SizedBox(width: 12.0),
+                              Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Text(
+                                      "From",
+                                      style: TextStyle(
+                                          color: Colors.grey, fontSize: 12),
+                                    ),
+                                    const SizedBox(height: 3),
+                                    Text(
+                                        Provider.of<AppInfo>(context)
+                                                    .userPickUpLocation !=
+                                                null
+                                            ? "${(Provider.of<AppInfo>(context, listen: false).userPickUpLocation!.locationName!).substring(0, 30)}.."
+                                            : "Not getting Address",
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: const TextStyle(
+                                            color: Colors.grey, fontSize: 14))
+                                  ])
+                            ],
+                          ),
+                          const SizedBox(height: 15),
+                          const Divider(
+                            indent: 30,
+                            height: 1,
+                            thickness: 1,
+                            color: Colors.grey,
+                          ),
+                          const SizedBox(height: 10),
+
+                          GestureDetector(
+                            onTap: () async {
+                              //! Go to seaech place screen
+                              var responseFromSearchScreen =
+                                  await Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (c) =>
+                                              const SearchPlacesScreen()));
+
+                              if (responseFromSearchScreen ==
+                                  "obtainedDropoff") {
+                                //Draw Routes - draw polyline..
+                                await drawPolyLineFromOriginToDistination();
+                                setState(() {
+                                  openNavigationDrawer = false;
+                                });
+                              }
+                            },
+                            child: Row(
+                              children: [
+                                const Icon(Icons.add_location_alt_outlined,
+                                    color: Colors.grey),
+                                const SizedBox(width: 12.0),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Text(
+                                      "Where to",
+                                      style: TextStyle(
+                                          color: Colors.grey, fontSize: 12),
+                                    ),
+                                    const SizedBox(height: 3),
+                                    Text(
+                                      Provider.of<AppInfo>(context)
+                                                  .userDropOffLocation !=
+                                              null
+                                          ? Provider.of<AppInfo>(context,
+                                                  listen: false)
+                                              .userDropOffLocation!
+                                              .locationName!
+                                          : "Your Destination Location",
+                                      overflow: TextOverflow.ellipsis,
+                                      style: const TextStyle(
+                                        color: Colors.grey,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 5),
+                          const Divider(
+                            indent: 30,
+                            height: 1,
+                            thickness: 1,
+                            color: Colors.grey,
+                          ),
+                          const SizedBox(height: 10),
+                          ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.green,
+                              textStyle: const TextStyle(fontSize: 16),
+                              shape: const RoundedRectangleBorder(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(10))),
+                            ),
+                            onPressed: () {
+                              if (Provider.of<AppInfo>(context, listen: false)
+                                      .userDropOffLocation !=
+                                  null) {
+                                saveRideRequestInformation();
+                              } else {
+                                Fluttertoast.showToast(
+                                    msg: "Please select destination ");
+                              }
+                            },
+                            child: Text(
+                              "Request a ride".toUpperCase(),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ))
+          ],
+        ));
   }
 }

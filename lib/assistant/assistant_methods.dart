@@ -14,8 +14,7 @@ import 'dart:developer' as developer;
 import 'package:users_app/screens/global/map_key.dart';
 
 class AssistantMethods {
-  //! Funcation for searchAddressForGeographicCordinates..
-
+//todo: ->  Funcation for searchAddressForGeographicCordinates..
   static Future<String> searchAddressForGeographicCordinates(
       Position position, context) async {
     String apiURL =
@@ -35,6 +34,7 @@ class AssistantMethods {
     return humanReadableAddress;
   }
 
+//todo: Read Current Online Information Drivers..
   static void readCurrentOnLineInfo() async {
     currentFirebaseUser = FirebaseAuth.instance.currentUser;
     DatabaseReference userRef = FirebaseDatabase.instance
@@ -50,8 +50,7 @@ class AssistantMethods {
     });
   }
 
-  //! Start to End Direction details
-
+//todo: -> Start to End Direction details
   static Future<DirectionDetailsInfo?> obtainedOriginToDestinationDetails(
       LatLng originPosition, LatLng destinationPosition) async {
     String urlOriginToDestination =

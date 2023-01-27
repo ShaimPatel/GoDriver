@@ -1,6 +1,8 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first, must_be_immutable
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:smooth_star_rating_null_safety/smooth_star_rating_null_safety.dart';
 
 import 'package:users_app/screens/global/global.dart';
@@ -8,6 +10,7 @@ import 'package:users_app/screens/global/global.dart';
 import '../../assistant/assistant_methods.dart';
 
 class SelectNearestActiveDriversScreen extends StatefulWidget {
+//! Initilazation Section...****
   DatabaseReference? referenceRideRequest;
   SelectNearestActiveDriversScreen({
     Key? key,
@@ -21,8 +24,10 @@ class SelectNearestActiveDriversScreen extends StatefulWidget {
 
 class _SelectNearestActiveDriversScreenState
     extends State<SelectNearestActiveDriversScreen> {
-//! Get Fare Amount Accouding To Vehicle Type..!
+//! Funcation/Method Section....*
+
   String fareAmount = '';
+//todo: Get Fare Amount Accouding To Vehicle Type..!
   getFareAmountAccordingToVehicleType(int index) {
     if (tripdirectionDetailsInfo != null) {
       if (dList[index]["car_details"]["type"].toString() == "bike") {
@@ -49,6 +54,7 @@ class _SelectNearestActiveDriversScreenState
     return fareAmount;
   }
 
+//! UI Section...*****
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -61,6 +67,8 @@ class _SelectNearestActiveDriversScreenState
           onPressed: () {
             //! Delete the ride request from database..
             widget.referenceRideRequest!.remove();
+            Fluttertoast.showToast(msg: "You have canclled the ride request");
+            SystemNavigator.pop();
           },
           icon: const Icon(
             Icons.close,

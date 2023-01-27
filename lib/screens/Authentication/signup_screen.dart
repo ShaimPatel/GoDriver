@@ -15,13 +15,13 @@ class SignUpScreen extends StatefulWidget {
 }
 
 class _SignUpScreenState extends State<SignUpScreen> {
-  //!
+//! Initilazation Section...****
   TextEditingController nameTextEditingController = TextEditingController();
   TextEditingController emailTextEditingController = TextEditingController();
   TextEditingController phoneTextEditingController = TextEditingController();
   TextEditingController passwordTextEditingController = TextEditingController();
 
-  //! validate
+//todo:  For Validatations...
   validateForm() {
     if (nameTextEditingController.text.length < 3) {
       return Fluttertoast.showToast(
@@ -73,7 +73,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
     }
   }
 
-//! Save Drive Infomation..
+//todo:  Save Drive Infomation..
   saveUserInfo() async {
     showDialog(
         context: context,
@@ -118,6 +118,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
     }
   }
 
+//! UI Section...****
   @override
   Widget build(BuildContext context) {
     return Scaffold(

@@ -50,7 +50,7 @@ class _MySplashScreenState extends State<MySplashScreen> {
               Image.asset("assets/images/logo.png"),
               const SizedBox(height: 25),
               const Text(
-                "GoDriver user App",
+                "Go User App",
                 style: TextStyle(
                   fontSize: 24,
                   color: Colors.white,
