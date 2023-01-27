@@ -38,6 +38,8 @@ class _SearchPlacesScreenState extends State<SearchPlacesScreen> {
     }
   }
 
+//! 
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

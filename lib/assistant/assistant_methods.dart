@@ -81,4 +81,20 @@ class AssistantMethods {
 
     return directionDetailsInfo;
   }
+
+//todo : Calculate Fare Amount from Origin to Destination
+  static double calculateFareAmountFronOriginToDestination(
+      DirectionDetailsInfo directionDetailsInfo) {
+    double timeTravelrdFareAmountPerMinute =
+        (directionDetailsInfo.durationValue! / 60) * 0.1;
+    double distanceTravelrdFareAmountPerKiloMeter =
+        (directionDetailsInfo.durationValue! / 1000) * 0.1;
+
+    // 1 USD = 80 Rupies
+    double totalFareAmount = timeTravelrdFareAmountPerMinute +
+        distanceTravelrdFareAmountPerKiloMeter;
+    double localCurrancyTotalFare = totalFareAmount * 80;
+
+    return double.parse(localCurrancyTotalFare.toStringAsFixed(1));
+  }
 }

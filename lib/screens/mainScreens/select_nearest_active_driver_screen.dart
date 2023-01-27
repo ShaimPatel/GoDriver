@@ -1,9 +1,18 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first, must_be_immutable
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:smooth_star_rating_null_safety/smooth_star_rating_null_safety.dart';
+
 import 'package:users_app/screens/global/global.dart';
 
+import '../../assistant/assistant_methods.dart';
+
 class SelectNearestActiveDriversScreen extends StatefulWidget {
-  const SelectNearestActiveDriversScreen({super.key});
+  DatabaseReference? referenceRideRequest;
+  SelectNearestActiveDriversScreen({
+    Key? key,
+    required this.referenceRideRequest,
+  }) : super(key: key);
 
   @override
   State<SelectNearestActiveDriversScreen> createState() =>
@@ -12,6 +21,34 @@ class SelectNearestActiveDriversScreen extends StatefulWidget {
 
 class _SelectNearestActiveDriversScreenState
     extends State<SelectNearestActiveDriversScreen> {
+//! Get Fare Amount Accouding To Vehicle Type..!
+  String fareAmount = '';
+  getFareAmountAccordingToVehicleType(int index) {
+    if (tripdirectionDetailsInfo != null) {
+      if (dList[index]["car_details"]["type"].toString() == "bike") {
+        fareAmount =
+            (AssistantMethods.calculateFareAmountFronOriginToDestination(
+                        tripdirectionDetailsInfo!) /
+                    2)
+                .toStringAsFixed(1);
+      }
+      if (dList[index]["car_details"]["type"].toString() == "uber-x") {
+        fareAmount =
+            (AssistantMethods.calculateFareAmountFronOriginToDestination(
+                        tripdirectionDetailsInfo!) *
+                    2)
+                .toStringAsFixed(1);
+      }
+      if (dList[index]["car_details"]["type"].toString() == "uber-go") {
+        fareAmount =
+            AssistantMethods.calculateFareAmountFronOriginToDestination(
+                    tripdirectionDetailsInfo!)
+                .toStringAsFixed(1);
+      }
+    }
+    return fareAmount;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -23,6 +60,7 @@ class _SelectNearestActiveDriversScreenState
         leading: IconButton(
           onPressed: () {
             //! Delete the ride request from database..
+            widget.referenceRideRequest!.remove();
           },
           icon: const Icon(
             Icons.close,
@@ -67,17 +105,35 @@ class _SelectNearestActiveDriversScreenState
                   ]),
               trailing: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: const [
+                children: [
                   Text(
-                    "13 km",
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold, color: Colors.black),
+                    tripdirectionDetailsInfo != null
+                        ? tripdirectionDetailsInfo!.durationText!
+                        : "..",
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                      fontSize: 14,
+                    ),
                   ),
-                  SizedBox(height: 2),
+                  const SizedBox(height: 2),
                   Text(
-                    "\$ 3",
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold, color: Colors.white),
+                    tripdirectionDetailsInfo != null
+                        ? tripdirectionDetailsInfo!.distenceText!
+                        : "..",
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w400,
+                      fontSize: 12,
+                      color: Colors.white,
+                    ),
+                  ),
+                  Text(
+                    "₹${getFareAmountAccordingToVehicleType(index)}",
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                      fontSize: 10,
+                    ),
                   ),
                 ],
               ),

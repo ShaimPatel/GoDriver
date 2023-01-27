@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:users_app/models/direction_details_info.dart';
 
 import '../../models/user_model.dart';
 
@@ -8,3 +9,4 @@ UserModel? userModelCurrentInfo;
 
 //! Drivers List Driver Key Containe info.
 List dList = [];
+DirectionDetailsInfo? tripdirectionDetailsInfo;

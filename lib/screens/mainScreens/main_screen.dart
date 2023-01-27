@@ -51,6 +51,8 @@ class MainScreenState extends State<MainScreen> {
   BitmapDescriptor? activeNearbyIcon;
   List<ActiveNearbyAvilableDrivers> onlineNearbyAvailableDriversList = [];
 
+  DatabaseReference? referenceRideRequest;
+
   static const CameraPosition _kGooglePlex = CameraPosition(
     target: LatLng(26.8467, 80.9462),
     zoom: 14.4746,
@@ -463,7 +465,7 @@ class MainScreenState extends State<MainScreen> {
                                         Provider.of<AppInfo>(context)
                                                     .userPickUpLocation !=
                                                 null
-                                            ? "${(Provider.of<AppInfo>(context).userPickUpLocation!.locationName!).substring(0, 30)}.."
+                                            ? "${(Provider.of<AppInfo>(context, listen: false).userPickUpLocation!.locationName!).substring(0, 30)}.."
                                             : "Not getting Address",
                                         maxLines: 1,
                                         overflow: TextOverflow.ellipsis,
@@ -518,7 +520,8 @@ class MainScreenState extends State<MainScreen> {
                                       Provider.of<AppInfo>(context)
                                                   .userDropOffLocation !=
                                               null
-                                          ? Provider.of<AppInfo>(context)
+                                          ? Provider.of<AppInfo>(context,
+                                                  listen: false)
                                               .userDropOffLocation!
                                               .locationName!
                                           : "Your Destination Location",
@@ -591,6 +594,9 @@ class MainScreenState extends State<MainScreen> {
     var directionDetailsInfo =
         await AssistantMethods.obtainedOriginToDestinationDetails(
             originLatLng, distinationLatLng);
+    setState(() {
+      tripdirectionDetailsInfo = directionDetailsInfo;
+    });
     Navigator.pop(context);
 
     //Print Value
@@ -709,16 +715,52 @@ class MainScreenState extends State<MainScreen> {
 
 //todo:->  Save Ride Request Infromation ..
   saveRideRequestInformation() {
+    referenceRideRequest = FirebaseDatabase.instance
+        .ref()
+        .child("All Ride Request")
+        .push(); //Push Create a Uniq Ride request..
+
+    var originLocation =
+        Provider.of<AppInfo>(context, listen: false).userPickUpLocation;
+    var destinationLocation =
+        Provider.of<AppInfo>(context, listen: false).userDropOffLocation;
+
+    Map originLocationMap = {
+      //"key" : "value"
+      "latitude": originLocation!.locationLatitude.toString(),
+      "longitude": originLocation.locationLongitude.toString(),
+    };
+
+    Map destinationLocationMap = {
+      //"key" : "value"
+      "latitude": destinationLocation!.locationLatitude.toString(),
+      "longitude": destinationLocation.locationLongitude.toString(),
+    };
+
+    Map userInformationMap = {
+      "origin": originLocationMap,
+      "destination": destinationLocationMap,
+      "time": DateTime.now().toString(),
+      "userName": userModelCurrentInfo!.name,
+      "userPhone": userModelCurrentInfo!.phone,
+      "originAddress": originLocation.locationName,
+      "destinationAddress": destinationLocation.locationName,
+      "driverID": "waiting",
+    };
+
+    referenceRideRequest!.set(userInformationMap);
+
     onlineNearbyAvailableDriversList =
         GeoFireAssistant.activeNearbyAvilableDriversList;
     searchNearstOnlineDrivers();
   }
 
+//todo: Search Near Online Drivers..
   searchNearstOnlineDrivers() async {
     //? No Active Driver Then work this
     if (onlineNearbyAvailableDriversList.isEmpty) {
       //Cancle the ride Request..
-
+      referenceRideRequest!.remove();
       setState(() {
         polylineSet.clear();
         markerSet.clear();
@@ -735,7 +777,8 @@ class MainScreenState extends State<MainScreen> {
     Navigator.push(
         context,
         MaterialPageRoute(
-            builder: (c) => const SelectNearestActiveDriversScreen()));
+            builder: (c) => SelectNearestActiveDriversScreen(
+                referenceRideRequest: referenceRideRequest)));
   }
 
 //todo: When Driver are Active
