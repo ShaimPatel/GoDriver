@@ -1,4 +1,6 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first, must_be_immutable
+import 'package:assets_audio_player/assets_audio_player.dart';
+import 'package:driver_app/global/global.dart';
 import 'package:flutter/material.dart';
 
 import 'package:driver_app/models/user_ride_request_infomation.dart';
@@ -45,6 +47,13 @@ class _NotificationDialogBoxState extends State<NotificationDialogBox> {
                   fontSize: 22,
                 )),
             const SizedBox(height: 12.0),
+            const Divider(
+              thickness: 1,
+              height: 3,
+              indent: 15,
+              color: Colors.grey,
+              endIndent: 15,
+            ),
             Padding(
               padding: const EdgeInsets.all(20.0),
               child: Column(
@@ -96,7 +105,7 @@ class _NotificationDialogBoxState extends State<NotificationDialogBox> {
             ),
 
             const Divider(
-              thickness: 3,
+              thickness: 1,
               height: 3,
               indent: 25,
               color: Colors.grey,
@@ -111,6 +120,9 @@ class _NotificationDialogBoxState extends State<NotificationDialogBox> {
                   //? For Cancle
                   ElevatedButton(
                     onPressed: () {
+                      audioPlayer.pause();
+                      audioPlayer.stop();
+                      audioPlayer = AssetsAudioPlayer();
                       Navigator.of(context).pop();
                     },
                     style: ButtonStyle(
@@ -130,6 +142,9 @@ class _NotificationDialogBoxState extends State<NotificationDialogBox> {
                   //For Accept
                   ElevatedButton(
                     onPressed: () {
+                      audioPlayer.pause();
+                      audioPlayer.stop();
+                      audioPlayer = AssetsAudioPlayer();
                       Navigator.of(context).pop();
                     },
                     style: ButtonStyle(

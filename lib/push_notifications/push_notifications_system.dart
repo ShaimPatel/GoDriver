@@ -1,3 +1,4 @@
+import 'package:assets_audio_player/assets_audio_player.dart';
 import 'package:driver_app/global/global.dart';
 import 'package:driver_app/models/user_ride_request_infomation.dart';
 import 'package:driver_app/push_notifications/notification_dialog_box.dart';
@@ -75,6 +76,9 @@ class PushNotificationSystem {
         .once()
         .then((snapData) {
       if (snapData.snapshot.value != null) {
+        //? Place Sound Notification
+        audioPlayer.open(Audio("assets/music/music_notification.mp3"));
+        audioPlayer.play();
         double originLatitude = double.parse(
             (snapData.snapshot.value! as Map)["origin"]["latitude"]);
         double originLongitude = double.parse(
@@ -114,6 +118,7 @@ class PushNotificationSystem {
 
         //? Call showDialog
         showDialog(
+            barrierDismissible: false,
             context: context,
             builder: (BuildContext ctx) => NotificationDialogBox(
                 userRideRequestDetails: userRideRequestDetails));
