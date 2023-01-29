@@ -11,6 +11,7 @@ class _EraningTabPageState extends State<EraningTabPage> {
   @override
   Widget build(BuildContext context) {
     return const Center(
+      //! Earning Page
       child: Text("earning"),
     );
   }

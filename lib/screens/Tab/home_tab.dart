@@ -238,7 +238,7 @@ class _HomeTabPageState extends State<HomeTabPage> {
   readCurrentDriverInfomation() async {
     currentFirebaseUser = firebaseAuth.currentUser;
     PushNotificationSystem pushNotificationSystem = PushNotificationSystem();
-    pushNotificationSystem.initializationCloudMessaging();
+    pushNotificationSystem.initializationCloudMessaging(context);
     pushNotificationSystem.generateAndGetToken();
   }
 
@@ -293,7 +293,8 @@ class _HomeTabPageState extends State<HomeTabPage> {
     reff.remove();
     reff = null;
     Future.delayed(const Duration(milliseconds: 2000), () {
-      SystemChannels.platform.invokeMethod("SystemNavigator.pop");
+      // SystemChannels.platform.invokeMethod("SystemNavigator.pop");
+      SystemNavigator.pop();
     });
   }
 
