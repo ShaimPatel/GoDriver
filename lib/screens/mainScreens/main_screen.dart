@@ -561,11 +561,42 @@ class MainScreenState extends State<MainScreen> {
     }
 
     await retriveOnlineDriveInfo(onlineNearbyAvailableDriversList);
-    Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (c) => SelectNearestActiveDriversScreen(
-                referenceRideRequest: referenceRideRequest)));
+    var response = await Navigator.push(
+      context,
+      MaterialPageRoute(
+          builder: (c) => SelectNearestActiveDriversScreen(
+              referenceRideRequest: referenceRideRequest)),
+    );
+    if (response == "DriverSelected") {
+      FirebaseDatabase.instance
+          .ref()
+          .child("drivers")
+          .child(selectedDriverId!)
+          .once()
+          .then((snap) {
+        if (snap.snapshot.value != null) {
+          //? Send Notification to Specific Driver..
+          sendNotificationDriverNow(selectedDriverId!);
+        } else {
+          //? Flutter Toast
+          Fluttertoast.showToast(
+              msg: "This driver do not exit , try again Later :: ");
+        }
+      });
+    }
+  }
+
+//! sendNotificationDriverNow
+  sendNotificationDriverNow(String selectedDriverId) {
+    //? Assign rideRequest to new RideStatus in drivers Parent node for that specific choosen driver..
+    FirebaseDatabase.instance
+        .ref()
+        .child("drivers")
+        .child(selectedDriverId)
+        .child("newRideStatus")
+        .set(referenceRideRequest!.key);
+
+    //?Automate the push notification..
   }
 
 //todo: When Driver are Active

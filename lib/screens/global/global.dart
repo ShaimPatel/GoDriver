@@ -10,3 +10,4 @@ UserModel? userModelCurrentInfo;
 //! Drivers List Driver Key Containe info.
 List dList = [];
 DirectionDetailsInfo? tripdirectionDetailsInfo;
+String? selectedDriverId;
