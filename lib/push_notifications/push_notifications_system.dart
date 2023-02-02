@@ -96,6 +96,7 @@ class PushNotificationSystem {
             (snapData.snapshot.value! as Map)["userName"].toString();
         String userPhone =
             (snapData.snapshot.value! as Map)["userPhone"].toString();
+        String rideRequestID = snapData.snapshot.key!;
 
         UserRideRequestInformation userRideRequestDetails =
             UserRideRequestInformation();
@@ -108,6 +109,7 @@ class PushNotificationSystem {
 
         userRideRequestDetails.userName = userName;
         userRideRequestDetails.userPhone = userPhone;
+        userRideRequestDetails.rideRequestId = rideRequestID;
 
         //? Print Infomation of User..
         developer.log("This is User Ride Request Infomation :: ");

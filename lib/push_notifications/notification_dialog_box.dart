@@ -1,9 +1,13 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first, must_be_immutable
 import 'package:assets_audio_player/assets_audio_player.dart';
 import 'package:driver_app/global/global.dart';
+import 'package:driver_app/screens/Main/new_trip_screen.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 
 import 'package:driver_app/models/user_ride_request_infomation.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'dart:developer' as developer;
 
 class NotificationDialogBox extends StatefulWidget {
   UserRideRequestInformation? userRideRequestDetails;
@@ -17,6 +21,50 @@ class NotificationDialogBox extends StatefulWidget {
 }
 
 class _NotificationDialogBoxState extends State<NotificationDialogBox> {
+//todo: Accept Ride Request..!
+  String getRideRequestID = '';
+
+  acceptRideRequest(BuildContext context) {
+    FirebaseDatabase.instance
+        .ref()
+        .child("drivers")
+        .child(currentFirebaseUser!.uid)
+        .child("newRideStatus")
+        .once()
+        .then((snap) {
+      if (snap.snapshot.value != null) {
+        getRideRequestID = snap.snapshot.value.toString();
+        // developer.log("This is getRideRequestID :: $getRideRequestID");
+      } else {
+        Fluttertoast.showToast(msg: "This Ride Request ID  don't exit");
+      }
+
+      developer.log(
+          "This is userRideRequestDetails :: ${widget.userRideRequestDetails!.rideRequestId}");
+      Fluttertoast.showToast(
+          msg:
+              "This is userRideRequestDetails ::${widget.userRideRequestDetails!.rideRequestId}");
+      if (getRideRequestID == widget.userRideRequestDetails!.rideRequestId) {
+        FirebaseDatabase.instance
+            .ref()
+            .child("drivers")
+            .child(currentFirebaseUser!.uid)
+            .child("newRideStatus")
+            .set("accepted");
+
+        //? send  driver to newRideScreen.. TripScreen
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: ((context) => NewTripScreen(
+                  userRideRequestDetails: widget.userRideRequestDetails))),
+        );
+      } else {
+        Fluttertoast.showToast(msg: "This Ride  Request don't exit");
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Dialog(
@@ -142,10 +190,14 @@ class _NotificationDialogBoxState extends State<NotificationDialogBox> {
                   //For Accept
                   ElevatedButton(
                     onPressed: () {
+                      //? Notification sound..
+
                       audioPlayer.pause();
                       audioPlayer.stop();
                       audioPlayer = AssetsAudioPlayer();
-                      Navigator.of(context).pop();
+
+                      //? ac
+                      acceptRideRequest(context);
                     },
                     style: ButtonStyle(
                       backgroundColor:
