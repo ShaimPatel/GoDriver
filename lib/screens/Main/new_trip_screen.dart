@@ -4,8 +4,10 @@ import 'dart:async';
 
 import 'package:driver_app/global/global.dart';
 import 'package:driver_app/models/user_ride_request_infomation.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import '../../Widgets/progess_dialog.dart';
@@ -29,13 +31,16 @@ class _NewTripScreenState extends State<NewTripScreen> {
 
   String? buttonTile = "Arrived";
   Color? buttonColors = Colors.green;
-
+  Position? onlinedriverCurrentPosition;
   Set<Marker> setOfMarker = <Marker>{};
   Set<Circle> setOfCircle = <Circle>{};
   Set<Polyline> setOfPolyline = <Polyline>{};
   List<LatLng> polyLinePositionCordinates = [];
   PolylinePoints polylinePoints = PolylinePoints();
   double mapPadding = 0.0;
+
+  BitmapDescriptor? iconAnimatedMarker;
+  var geoLocator = Geolocator();
 
   static const CameraPosition _kGooglePlex =
       CameraPosition(target: LatLng(26.8467, 80.9462), zoom: 14.4746);
@@ -146,10 +151,98 @@ class _NewTripScreenState extends State<NewTripScreen> {
     });
   }
 
+//todo:  Save Assign Driver Details to user Ride Request..!
+
+  saveAssigenDriverDetailsUserRiderRequest() {
+    DatabaseReference databaseReference = FirebaseDatabase.instance
+        .ref()
+        .child("All Ride Request")
+        .child(widget.userRideRequestDetails!.rideRequestId!);
+
+    Map dricerLocationDataMap = {
+      "latitude": driverCurrantPosition!.latitude.toString(),
+      "longitude": driverCurrantPosition!.longitude.toString(),
+    };
+
+    databaseReference.child("status").set("accepted");
+    databaseReference.child("driverID").set(driverData.id);
+    databaseReference.child("driverName").set(driverData.name);
+    databaseReference.child("driverPhone").set(driverData.phone);
+    databaseReference.child("car_details").set(
+        "${driverData.carColor}${driverData.carModel}${driverData.carNumber}");
+    databaseReference.child("driverLocation").set(dricerLocationDataMap);
+
+    saveRideRequestIdToDriverHistory();
+  }
+
+//todo: Save Ride Request To Driver History..!
+
+  saveRideRequestIdToDriverHistory() {
+    DatabaseReference tripsHistoryRefrence = FirebaseDatabase.instance
+        .ref()
+        .child("drivers")
+        .child(currentFirebaseUser!.uid)
+        .child("tripshistory");
+
+    tripsHistoryRefrence
+        .child(widget.userRideRequestDetails!.rideRequestId!)
+        .set(true);
+  }
+
+//todo:->  createActiveDriverIconMarker
+  createDriverIconMarker() {
+    if (iconAnimatedMarker == null) {
+      ImageConfiguration imageConfiguration = createLocalImageConfiguration(
+        context,
+        size: const Size(2, 2),
+      );
+      BitmapDescriptor.fromAssetImage(
+              imageConfiguration, "assets/images/car.png")
+          .then((value) {
+        iconAnimatedMarker = value;
+      });
+    }
+  }
+//todo: ->  Update Drivers Location RealTime..
+
+  getDriversLocationsUpdateAtRealTime() {
+    streamSubscriptionDriverLivePosition =
+        Geolocator.getPositionStream().listen((Position position) {
+      onlinedriverCurrentPosition = position;
+
+      LatLng latLngLiveDriverPosition = LatLng(
+          driverCurrantPosition!.latitude, driverCurrantPosition!.longitude);
+      Marker animatingMarker = Marker(
+          markerId: const MarkerId("Animatedmarker"),
+          position: latLngLiveDriverPosition,
+          icon: iconAnimatedMarker!,
+          infoWindow: const InfoWindow(title: "This is your Current Location"));
+      setState(() {
+        CameraPosition cameraPosition =
+            CameraPosition(target: latLngLiveDriverPosition, zoom: 16);
+        newTripGoogleMapController!
+            .animateCamera(CameraUpdate.newCameraPosition(
+          cameraPosition,
+        ));
+        setOfMarker.removeWhere(
+            (element) => element.markerId.value == "Animatedmarker");
+        setOfMarker.add(animatingMarker);
+      });
+    });
+  }
+
+//! InitSectin ..****
+  @override
+  void initState() {
+    super.initState();
+    saveAssigenDriverDetailsUserRiderRequest();
+  }
+
 //! UI Section...*****
 
   @override
   Widget build(BuildContext context) {
+    createDriverIconMarker();
     return Scaffold(
       body: Stack(
         children: [
@@ -180,6 +273,7 @@ class _NewTripScreenState extends State<NewTripScreen> {
 
                 drawPolyLineFromDriverCurrentPositionToUserOriginLocation(
                     driverCurrentLatLng, userPickUpLocation!);
+                getDriversLocationsUpdateAtRealTime();
               }),
 
           //? UI

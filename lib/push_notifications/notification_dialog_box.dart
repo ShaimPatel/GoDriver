@@ -1,5 +1,6 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first, must_be_immutable
 import 'package:assets_audio_player/assets_audio_player.dart';
+import 'package:driver_app/assistant/assistant_methods.dart';
 import 'package:driver_app/global/global.dart';
 import 'package:driver_app/screens/Main/new_trip_screen.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -51,7 +52,7 @@ class _NotificationDialogBoxState extends State<NotificationDialogBox> {
             .child(currentFirebaseUser!.uid)
             .child("newRideStatus")
             .set("accepted");
-
+        AssistantMethods.pauseLiveLocationUpdates();
         //? send  driver to newRideScreen.. TripScreen
         Navigator.push(
           context,

@@ -99,12 +99,6 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   void initState() {
     super.initState();
-    _controller = VideoPlayerController.asset("assets/vedio/login.mp4")
-      ..initialize().then((_) {
-        _controller.play();
-        _controller.setLooping(true);
-        setState(() {});
-      });
   }
 
   @override
@@ -119,15 +113,6 @@ class _LoginScreenState extends State<LoginScreen> {
       backgroundColor: Colors.white.withOpacity(1),
       body: Stack(
         children: [
-          SizedBox.expand(
-              child: FittedBox(
-            fit: BoxFit.fill,
-            child: SizedBox(
-              width: _controller.value.size.width,
-              height: _controller.value.size.height,
-              child: VideoPlayer(_controller),
-            ),
-          )),
           SingleChildScrollView(
             child: Container(
               color: Colors.white.withOpacity(0.2),

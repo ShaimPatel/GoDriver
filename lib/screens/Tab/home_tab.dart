@@ -14,6 +14,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import '../../assistant/black_theme_google_map.dart';
+import 'dart:developer' as developer;
 
 class HomeTabPage extends StatefulWidget {
   const HomeTabPage({super.key});
@@ -62,7 +63,6 @@ class _HomeTabPageState extends State<HomeTabPage> {
     newGoogleMapController!
         .animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
 
-    // ignore: unused_local_variable
     String humanReadableAddress =
         await AssistantMethods.searchAddressForGeographicCordinates(
             driverCurrantPosition!, context);
@@ -71,6 +71,32 @@ class _HomeTabPageState extends State<HomeTabPage> {
 //todo:  Read Current Drivers Infomation..
   readCurrentDriverInfomation() async {
     currentFirebaseUser = firebaseAuth.currentUser;
+    await FirebaseDatabase.instance
+        .ref()
+        .child("drivers")
+        .child(currentFirebaseUser!.uid)
+        .once()
+        .then((DatabaseEvent snap) {
+      if (snap.snapshot.value != null) {
+        driverData.id = (snap.snapshot.value as Map)["id"];
+        driverData.email = (snap.snapshot.value as Map)["email"];
+        driverData.name = (snap.snapshot.value as Map)["name"];
+        driverData.phone = (snap.snapshot.value as Map)["phone"];
+        driverData.carColor =
+            (snap.snapshot.value as Map)["car_details"]["car_color"];
+        driverData.carModel =
+            (snap.snapshot.value as Map)["car_details"]["car_model"];
+        driverData.carNumber =
+            (snap.snapshot.value as Map)["car_details"]["car_number"];
+
+        developer
+            .log((snap.snapshot.value as Map)["car_details"]["car_number"]);
+        developer.log(driverData.name = (snap.snapshot.value as Map)["name"]);
+        developer
+            .log((snap.snapshot.value as Map)["car_details"]["car_number"]);
+      }
+    });
+
     PushNotificationSystem pushNotificationSystem = PushNotificationSystem();
     pushNotificationSystem.initializationCloudMessaging(context);
     pushNotificationSystem.generateAndGetToken();
