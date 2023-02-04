@@ -1,4 +1,4 @@
-// ignore_for_file: must_be_immutable
+// ignore_for_file: must_be_immutable, use_build_context_synchronously
 
 import 'dart:async';
 
@@ -38,6 +38,9 @@ class _NewTripScreenState extends State<NewTripScreen> {
   List<LatLng> polyLinePositionCordinates = [];
   PolylinePoints polylinePoints = PolylinePoints();
   double mapPadding = 0.0;
+  String rideRequestStatus = "accepted";
+  String durationFromOriginToDestination = "";
+  bool isRequestDirectinDetails = false;
 
   BitmapDescriptor? iconAnimatedMarker;
   var geoLocator = Geolocator();
@@ -56,7 +59,7 @@ class _NewTripScreenState extends State<NewTripScreen> {
 //todo: originLatLng  = UserPickUpLocation Location
 //todo : destinationLatLng  = user DropOff Location.
 //todo:-> Here are drawPolyLineFromSourceToDistination
-  Future<void> drawPolyLineFromDriverCurrentPositionToUserOriginLocation(
+  Future<void> drawPolyLineFromOriginToDestination(
       LatLng originLatLng, LatLng destinationLatLng) async {
     showDialog(
         context: context,
@@ -206,9 +209,11 @@ class _NewTripScreenState extends State<NewTripScreen> {
 //todo: ->  Update Drivers Location RealTime..
 
   getDriversLocationsUpdateAtRealTime() {
+    LatLng oldLatLng = const LatLng(0, 0);
     streamSubscriptionDriverLivePosition =
         Geolocator.getPositionStream().listen((Position position) {
       onlinedriverCurrentPosition = position;
+      driverCurrantPosition = position;
 
       LatLng latLngLiveDriverPosition = LatLng(
           driverCurrantPosition!.latitude, driverCurrantPosition!.longitude);
@@ -228,7 +233,52 @@ class _NewTripScreenState extends State<NewTripScreen> {
             (element) => element.markerId.value == "Animatedmarker");
         setOfMarker.add(animatingMarker);
       });
+      oldLatLng = latLngLiveDriverPosition;
+      updateDurationTimeAtRealTime();
+
+//? Updateng Driver Location At Real Time In dataBase..
+      Map driverLatLngDataMap = {
+        "latitude": driverCurrantPosition!.latitude.toString(),
+        "longitude": driverCurrantPosition!.longitude.toString()
+      };
+      FirebaseDatabase.instance
+          .ref()
+          .child("All Ride Request")
+          .child(widget.userRideRequestDetails!.rideRequestId!)
+          .child("driverLocation")
+          .set(driverLatLngDataMap);
     });
+  }
+
+//todo: Update Duratin Time At Real Time
+  updateDurationTimeAtRealTime() async {
+    if (isRequestDirectinDetails == false) {
+      isRequestDirectinDetails = true;
+      if (driverCurrantPosition == null) {
+        return;
+      }
+      var originLatLng = LatLng(
+        driverCurrantPosition!.latitude,
+        driverCurrantPosition!.longitude,
+      ); //DriverCurrentLocation
+      LatLng? destinationLatLng;
+      if (rideRequestStatus == "accepted") {
+        destinationLatLng =
+            widget.userRideRequestDetails!.originLatLng; //userPickUpLocation
+      } else {
+        var destinationLatLng = widget
+            .userRideRequestDetails!.destinationLatLng; //userDropOffLocation
+      }
+      var directionInfomation =
+          await AssistantMethods.obtainedOriginToDestinationDetails(
+              originLatLng, destinationLatLng!);
+      if (directionInfomation != null) {
+        setState(() {
+          durationFromOriginToDestination = directionInfomation.durationText!;
+        });
+      }
+      isRequestDirectinDetails = false;
+    }
   }
 
 //! InitSectin ..****
@@ -271,7 +321,7 @@ class _NewTripScreenState extends State<NewTripScreen> {
                 var userPickUpLocation =
                     widget.userRideRequestDetails!.originLatLng;
 
-                drawPolyLineFromDriverCurrentPositionToUserOriginLocation(
+                drawPolyLineFromOriginToDestination(
                     driverCurrentLatLng, userPickUpLocation!);
                 getDriversLocationsUpdateAtRealTime();
               }),
@@ -301,9 +351,9 @@ class _NewTripScreenState extends State<NewTripScreen> {
                 child: Column(
                   children: [
                     //? Duration
-                    const Text(
-                      "Arrive in : 2 min",
-                      style: TextStyle(
+                    Text(
+                      durationFromOriginToDestination,
+                      style: const TextStyle(
                         fontSize: 16.0,
                         fontWeight: FontWeight.bold,
                         color: Colors.lightGreenAccent,
@@ -403,7 +453,39 @@ class _NewTripScreenState extends State<NewTripScreen> {
                             color: Colors.white,
                           )),
                         ),
-                        onPressed: () {},
+                        onPressed: () async {
+                          if (rideRequestStatus ==
+                              "accepted") //driver has arrived at user pickUp location
+                          {
+                            rideRequestStatus = "arrived";
+                            FirebaseDatabase.instance
+                                .ref()
+                                .child("All Ride Request")
+                                .child(widget
+                                    .userRideRequestDetails!.rideRequestId!)
+                                .child("status")
+                                .set(rideRequestStatus);
+
+                            setState(() {
+                              buttonTile = "Start Trip";
+                              buttonColors = Colors.green;
+                            });
+
+                            showDialog(
+                                context: context,
+                                barrierDismissible: true,
+                                builder: (BuildContext context) =>
+                                    const ProgressDialogWidget(
+                                        message: "Loading..!"));
+
+                            await drawPolyLineFromOriginToDestination(
+                                widget.userRideRequestDetails!.originLatLng!,
+                                widget.userRideRequestDetails!
+                                    .destinationLatLng!);
+
+                            Navigator.pop(context);
+                          }
+                        },
                         icon: const Icon(
                           Icons.directions_car,
                           size: 25,
