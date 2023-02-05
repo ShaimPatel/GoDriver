@@ -88,6 +88,7 @@ class _HomeTabPageState extends State<HomeTabPage> {
             (snap.snapshot.value as Map)["car_details"]["car_model"];
         driverData.carNumber =
             (snap.snapshot.value as Map)["car_details"]["car_number"];
+        driverVehicleType = (snap.snapshot.value as Map)["car_details"]["type"];
 
         developer
             .log((snap.snapshot.value as Map)["car_details"]["car_number"]);

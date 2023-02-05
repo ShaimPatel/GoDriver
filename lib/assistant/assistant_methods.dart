@@ -96,4 +96,30 @@ class AssistantMethods {
     Geofire.setLocation(currentFirebaseUser!.uid,
         driverCurrantPosition!.latitude, driverCurrantPosition!.longitude);
   }
+
+//todo : Calculate Fare Amount from Origin to Destination
+  static double calculateFareAmountFronOriginToDestination(
+      DirectionDetailsInfo directionDetailsInfo) {
+    double timeTravelrdFareAmountPerMinute =
+        (directionDetailsInfo.durationValue! / 60) * 0.1;
+    double distanceTravelrdFareAmountPerKiloMeter =
+        (directionDetailsInfo.durationValue! / 1000) * 0.1;
+
+    // 1 USD = 80 Rupies
+    double totalFareAmount = timeTravelrdFareAmountPerMinute +
+        distanceTravelrdFareAmountPerKiloMeter;
+    double localCurrancyTotalFare = totalFareAmount * 80;
+
+    if (driverVehicleType == "bike") {
+      double resultFareAmount = (totalFareAmount.truncate()) / 2.0;
+      return resultFareAmount;
+    } else if (driverVehicleType == "uber-go") {
+      return totalFareAmount.truncate().toDouble();
+    } else if (driverVehicleType == "uber-x") {
+      double resultFareAmount = (totalFareAmount.truncate()) * 2.0;
+      return resultFareAmount;
+    } else {
+      return totalFareAmount.truncate().toDouble();
+    }
+  }
 }
