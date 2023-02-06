@@ -327,6 +327,38 @@ class _NewTripScreenState extends State<NewTripScreen> {
         builder: (BuildContext context) => FareAmountCollectionDialog(
               totalFareAmount: totalFareAmount,
             ));
+
+    //? Save fare amount to driver total earning..!
+    saveFareAmountToDriverEarnings(totalFareAmount);
+  }
+
+//todo:
+  saveFareAmountToDriverEarnings(double totalFareAmount) {
+    FirebaseDatabase.instance
+        .ref()
+        .child(currentFirebaseUser!.uid)
+        .child("eraning")
+        .once()
+        .then((snap) {
+      //?Earnig sub chils exits
+      if (snap.snapshot.value != null) {
+        double oldEarning = double.parse(snap.snapshot.value.toString());
+        double driverToatlEarning = oldEarning + totalFareAmount;
+        FirebaseDatabase.instance
+            .ref()
+            .child(currentFirebaseUser!.uid)
+            .child("eraning")
+            .set(driverToatlEarning.toString());
+      }
+      //?Earnig sub chils don't exits
+      else {
+        FirebaseDatabase.instance
+            .ref()
+            .child(currentFirebaseUser!.uid)
+            .child("eraning")
+            .set(totalFareAmount.toString());
+      }
+    });
   }
 
 //! InitSectin ..****
