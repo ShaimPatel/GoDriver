@@ -2,6 +2,7 @@
 
 import 'dart:async';
 
+import 'package:driver_app/Widgets/fare_amount_collection_dialog.dart';
 import 'package:driver_app/global/global.dart';
 import 'package:driver_app/models/user_ride_request_infomation.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -31,7 +32,7 @@ class _NewTripScreenState extends State<NewTripScreen> {
 
   String? buttonTile = "Arrived";
   Color? buttonColors = Colors.green;
-  Position? onlinedriverCurrentPosition;
+  Position? onlineDriverCurrentPosition;
   Set<Marker> setOfMarker = <Marker>{};
   Set<Circle> setOfCircle = <Circle>{};
   Set<Polyline> setOfPolyline = <Polyline>{};
@@ -212,11 +213,12 @@ class _NewTripScreenState extends State<NewTripScreen> {
     LatLng oldLatLng = const LatLng(0, 0);
     streamSubscriptionDriverLivePosition =
         Geolocator.getPositionStream().listen((Position position) {
-      onlinedriverCurrentPosition = position;
+      onlineDriverCurrentPosition = position;
       driverCurrantPosition = position;
 
       LatLng latLngLiveDriverPosition = LatLng(
-          driverCurrantPosition!.latitude, driverCurrantPosition!.longitude);
+          onlineDriverCurrentPosition!.latitude,
+          onlineDriverCurrentPosition!.longitude);
       Marker animatingMarker = Marker(
           markerId: const MarkerId("Animatedmarker"),
           position: latLngLiveDriverPosition,
@@ -238,8 +240,8 @@ class _NewTripScreenState extends State<NewTripScreen> {
 
 //? Updateng Driver Location At Real Time In dataBase..
       Map driverLatLngDataMap = {
-        "latitude": driverCurrantPosition!.latitude.toString(),
-        "longitude": driverCurrantPosition!.longitude.toString()
+        "latitude": onlineDriverCurrentPosition!.latitude.toString(),
+        "longitude": onlineDriverCurrentPosition!.longitude.toString()
       };
       FirebaseDatabase.instance
           .ref()
@@ -254,12 +256,12 @@ class _NewTripScreenState extends State<NewTripScreen> {
   updateDurationTimeAtRealTime() async {
     if (isRequestDirectinDetails == false) {
       isRequestDirectinDetails = true;
-      if (driverCurrantPosition == null) {
+      if (onlineDriverCurrentPosition == null) {
         return;
       }
       var originLatLng = LatLng(
-        driverCurrantPosition!.latitude,
-        driverCurrantPosition!.longitude,
+        onlineDriverCurrentPosition!.latitude,
+        onlineDriverCurrentPosition!.longitude,
       ); //DriverCurrentLocation
       LatLng? destinationLatLng;
       if (rideRequestStatus == "accepted") {
@@ -289,7 +291,8 @@ class _NewTripScreenState extends State<NewTripScreen> {
             const ProgressDialogWidget(message: "Please wait..!"));
     //? Get Trip Direction Details :: distance travlled
     var currentDriverPositionLatLng = LatLng(
-        driverCurrantPosition!.latitude, driverCurrantPosition!.longitude);
+        onlineDriverCurrentPosition!.latitude,
+        onlineDriverCurrentPosition!.longitude);
 
     var tripDirectionDetails =
         await AssistantMethods.obtainedOriginToDestinationDetails(
@@ -317,6 +320,13 @@ class _NewTripScreenState extends State<NewTripScreen> {
 
     streamSubscriptionDriverLivePosition.cancel();
     Navigator.pop(context);
+
+    //? Display Fare Amount in Dialog Box..
+    showDialog(
+        context: context,
+        builder: (BuildContext context) => FareAmountCollectionDialog(
+              totalFareAmount: totalFareAmount,
+            ));
   }
 
 //! InitSectin ..****
@@ -391,10 +401,10 @@ class _NewTripScreenState extends State<NewTripScreen> {
                     //? Duration
                     Text(
                       durationFromOriginToDestination,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 16.0,
                         fontWeight: FontWeight.bold,
-                        color: Colors.lightGreenAccent,
+                        color: buttonColors,
                       ),
                     ),
                     const SizedBox(height: 18.0),
@@ -505,7 +515,7 @@ class _NewTripScreenState extends State<NewTripScreen> {
 
                             setState(() {
                               buttonTile = "Start Trip";
-                              buttonColors = Colors.green;
+                              buttonColors = buttonColors;
                             });
 
                             showDialog(
@@ -542,15 +552,15 @@ class _NewTripScreenState extends State<NewTripScreen> {
                             endTripNow();
                           }
                         },
-                        icon: const Icon(
+                        icon: Icon(
                           Icons.directions_car,
                           size: 25,
-                          color: Colors.green,
+                          color: buttonColors,
                         ),
                         label: Text(
                           buttonTile!,
-                          style: const TextStyle(
-                            color: Colors.green,
+                          style: TextStyle(
+                            color: buttonColors,
                             fontSize: 16.0,
                             fontWeight: FontWeight.bold,
                           ),

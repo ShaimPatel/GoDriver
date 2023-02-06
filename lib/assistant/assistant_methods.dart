@@ -111,15 +111,15 @@ class AssistantMethods {
     double localCurrancyTotalFare = totalFareAmount * 80;
 
     if (driverVehicleType == "bike") {
-      double resultFareAmount = (totalFareAmount.truncate()) / 2.0;
+      double resultFareAmount = (localCurrancyTotalFare.truncate()) / 2.0;
       return resultFareAmount;
     } else if (driverVehicleType == "uber-go") {
-      return totalFareAmount.truncate().toDouble();
+      return localCurrancyTotalFare.truncate().toDouble();
     } else if (driverVehicleType == "uber-x") {
-      double resultFareAmount = (totalFareAmount.truncate()) * 2.0;
+      double resultFareAmount = (localCurrancyTotalFare.truncate()) * 2.0;
       return resultFareAmount;
     } else {
-      return totalFareAmount.truncate().toDouble();
+      return localCurrancyTotalFare.truncate().toDouble();
     }
   }
 }
