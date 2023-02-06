@@ -7,6 +7,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 
 import 'package:driver_app/models/user_ride_request_infomation.dart';
+import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'dart:developer' as developer;
 
@@ -172,6 +173,42 @@ class _NotificationDialogBoxState extends State<NotificationDialogBox> {
                       audioPlayer.pause();
                       audioPlayer.stop();
                       audioPlayer = AssetsAudioPlayer();
+
+                      //? Cancle Ride Request..!
+                      FirebaseDatabase.instance
+                          .ref()
+                          .child("All Ride Request")
+                          .child(widget.userRideRequestDetails!.rideRequestId!)
+                          .remove()
+                          .then((value) {
+                        FirebaseDatabase.instance
+                            .ref()
+                            .child("drivers")
+                            .child(currentFirebaseUser!.uid)
+                            .child("newRideStatus")
+                            .set("idle")
+                            .then((value) {
+                          FirebaseDatabase.instance
+                              .ref()
+                              .child("drivers")
+                              .child(currentFirebaseUser!.uid)
+                              .child("tripshistory")
+                              .child(
+                                  widget.userRideRequestDetails!.rideRequestId!)
+                              .remove();
+                        }).then((value) {
+                          Fluttertoast.showToast(
+                              msg:
+                                  "Ride Request has been Cancelled Successfully . Resatrt App Now");
+                        });
+                        Future.delayed(
+                          const Duration(seconds: 2),
+                          () {
+                            SystemNavigator.pop();
+                          },
+                        );
+                      });
+
                       Navigator.of(context).pop();
                     },
                     style: ButtonStyle(
