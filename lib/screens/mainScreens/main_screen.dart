@@ -2,6 +2,7 @@
 
 import 'dart:async';
 
+import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -38,6 +39,7 @@ class MainScreenState extends State<MainScreen> {
 
   var geoLocator = Geolocator();
   double searchLocationContainerHeight = 220;
+  double waitingResponseFromDriverContainerHeight = 0;
 
   List<LatLng> pLineCoOridinatesList = [];
   List<ActiveNearbyAvilableDrivers> onlineNearbyAvailableDriversList = [];
@@ -587,7 +589,15 @@ class MainScreenState extends State<MainScreen> {
     }
   }
 
-//! sendNotificationDriverNow
+//todo ::
+  showWaitingResponseUI() {
+    setState(() {
+      searchLocationContainerHeight = 0;
+      waitingResponseFromDriverContainerHeight = 220;
+    });
+  }
+
+//todo:  sendNotificationDriverNow
   sendNotificationDriverNow(String selectedDriverId) {
     //? Assign rideRequest to new RideStatus in drivers Parent node for that specific choosen driver..
     FirebaseDatabase.instance
@@ -616,6 +626,7 @@ class MainScreenState extends State<MainScreen> {
           context,
         );
         //todo: Display waiting Response Ui from Driver
+        showWaitingResponseUI();
 
         //todo: Response  From Driver .
 
@@ -680,6 +691,7 @@ class MainScreenState extends State<MainScreen> {
         ),
         body: Stack(
           children: [
+            //? Google Map ::
             GoogleMap(
               padding: EdgeInsets.only(bottom: bottompaddingOfMap!),
               myLocationEnabled: true,
@@ -703,7 +715,6 @@ class MainScreenState extends State<MainScreen> {
               },
             ),
             //Add a draver button ..
-
             Positioned(
               left: 22,
               top: 40,
@@ -878,6 +889,48 @@ class MainScreenState extends State<MainScreen> {
                     ),
                   ),
                 ))
+
+            //?  Ui  for waiting  response from Driver..
+            ,
+            Positioned(
+              bottom: 0,
+              left: 0,
+              right: 0,
+              child: Container(
+                height: waitingResponseFromDriverContainerHeight,
+                decoration: const BoxDecoration(
+                  color: Colors.black54,
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(20),
+                    topRight: Radius.circular(20),
+                  ),
+                ),
+                child: Center(
+                  child: AnimatedTextKit(
+                    animatedTexts: [
+                      FadeAnimatedText(
+                        'Waiting fro Response from Driver..',
+                        duration: const Duration(seconds: 6),
+                        textAlign: TextAlign.center,
+                        textStyle: const TextStyle(
+                            fontSize: 30.0,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white),
+                      ),
+                      ScaleAnimatedText(
+                        'Please wait..',
+                        duration: const Duration(seconds: 10),
+                        textAlign: TextAlign.center,
+                        textStyle: const TextStyle(
+                            fontSize: 32.0,
+                            color: Colors.white,
+                            fontFamily: 'Canterbury'),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
           ],
         ));
   }
