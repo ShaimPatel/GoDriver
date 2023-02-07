@@ -11,5 +11,7 @@ UserModel? userModelCurrentInfo;
 List dList = [];
 DirectionDetailsInfo? tripdirectionDetailsInfo;
 String? selectedDriverId;
-
+String driverCarDetails = "";
+String driverPhone = '';
+String driverName = '';
 String userDropOffAddress = '';

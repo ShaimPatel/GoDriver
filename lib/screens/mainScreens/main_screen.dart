@@ -40,6 +40,9 @@ class MainScreenState extends State<MainScreen> {
   var geoLocator = Geolocator();
   double searchLocationContainerHeight = 220;
   double waitingResponseFromDriverContainerHeight = 0;
+  double assignedDriverIntoContainerHeight = 0;
+  String driverRideStatus = "Driver is comming";
+  StreamSubscription<DatabaseEvent>? tripRideRequestInfoStreamSubscription;
 
   List<LatLng> pLineCoOridinatesList = [];
   List<ActiveNearbyAvilableDrivers> onlineNearbyAvailableDriversList = [];
@@ -539,7 +542,27 @@ class MainScreenState extends State<MainScreen> {
     };
 
     referenceRideRequest!.set(userInformationMap);
-
+    tripRideRequestInfoStreamSubscription =
+        referenceRideRequest!.onValue.listen((eventSnap) {
+      if (eventSnap.snapshot.value == null) {
+        return;
+      }
+      if ((eventSnap.snapshot.value as Map)['car_details'] != null) {
+        setState(() {
+          driverCarDetails = (eventSnap.snapshot.value as Map)['car_details'];
+        });
+      }
+      if ((eventSnap.snapshot.value as Map)['driverPhone'] != null) {
+        setState(() {
+          driverPhone = (eventSnap.snapshot.value as Map)['driverPhone'];
+        });
+      }
+      if ((eventSnap.snapshot.value as Map)['driverName'] != null) {
+        setState(() {
+          driverName = (eventSnap.snapshot.value as Map)['driverName'];
+        });
+      }
+    });
     onlineNearbyAvailableDriversList =
         GeoFireAssistant.activeNearbyAvilableDriversList;
     searchNearstOnlineDrivers();
@@ -648,11 +671,11 @@ class MainScreenState extends State<MainScreen> {
               SystemNavigator.pop();
             });
           }
-          //Driver accept tge rideRequest ::  Push Notification
-          //(newRideReuest == "accepted")
+          // :: -> Driver accept tge rideRequest ::  Push Notification
+          // :: -> (newRideReuest == "accepted")
           if (eventSnapshot.snapshot.value == "accepted") {
-            //Design And Display UI.. assigned Driver Information..
-
+            // :: -> Design And Display UI.. assigned Driver Information..
+            showUIForAssignedDriverInfo();
           }
         });
 
@@ -664,7 +687,16 @@ class MainScreenState extends State<MainScreen> {
     });
   }
 
-//todo: When Driver are Active
+//todo :: Show UI for Online Driver Info..
+  showUIForAssignedDriverInfo() {
+    setState(() {
+      waitingResponseFromDriverContainerHeight = 0;
+      searchLocationContainerHeight = 0;
+      assignedDriverIntoContainerHeight = 250;
+    });
+  }
+
+//todo :: When Driver are Active
   retriveOnlineDriveInfo(List onlineNearestDriversList) async {
     DatabaseReference ref = FirebaseDatabase.instance.ref().child("drivers");
     for (var i = 0; i < onlineNearestDriversList.length; i++) {
@@ -910,7 +942,7 @@ class MainScreenState extends State<MainScreen> {
                     animatedTexts: [
                       FadeAnimatedText(
                         'Waiting fro Response from Driver..',
-                        duration: const Duration(seconds: 6),
+                        duration: const Duration(seconds: 10),
                         textAlign: TextAlign.center,
                         textStyle: const TextStyle(
                             fontSize: 30.0,
@@ -919,7 +951,7 @@ class MainScreenState extends State<MainScreen> {
                       ),
                       ScaleAnimatedText(
                         'Please wait..',
-                        duration: const Duration(seconds: 10),
+                        duration: const Duration(seconds: 6),
                         textAlign: TextAlign.center,
                         textStyle: const TextStyle(
                             fontSize: 32.0,
@@ -931,6 +963,140 @@ class MainScreenState extends State<MainScreen> {
                 ),
               ),
             ),
+            //? :: UI for displaying Driver Informatin..
+            Positioned(
+              bottom: 0,
+              left: 0,
+              right: 0,
+              child: Container(
+                height: assignedDriverIntoContainerHeight,
+                decoration: const BoxDecoration(
+                  color: Colors.black54,
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(20),
+                    topRight: Radius.circular(20),
+                  ),
+                ),
+                child: Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      //? status of ride ..
+                      Center(
+                        child: Text(
+                          driverRideStatus,
+                          style: const TextStyle(
+                            fontSize: 23,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 14),
+                      const Divider(
+                          height: 2, thickness: 2, color: Colors.white54),
+                      const SizedBox(height: 14),
+
+                      //? :: Vechile Details ..
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          const Text(
+                            "Vechile Details : - ",
+                            textAlign: TextAlign.center,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                          Text(
+                            driverCarDetails,
+                            textAlign: TextAlign.center,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white54,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 4),
+
+                      //? :: Driver Name ..
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          const Text(
+                            "Driver Name : - ",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                          Text(
+                            driverName,
+                            textAlign: TextAlign.center,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white54,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 24),
+                      const Divider(
+                        height: 2,
+                        thickness: 2,
+                        color: Colors.white38,
+                      ),
+                      const SizedBox(height: 14),
+
+                      //? :: Call Driver Button
+                      Center(
+                        child: ElevatedButton.icon(
+                          style: ElevatedButton.styleFrom(
+                            textStyle: const TextStyle(fontSize: 16),
+                            backgroundColor: Colors.transparent,
+                            foregroundColor: Colors.green,
+                            side: const BorderSide(
+                              color: Colors.white,
+                              width: 2,
+                            ),
+                            shape: const RoundedRectangleBorder(
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(10),
+                              ),
+                            ),
+                          ),
+                          onPressed: () {},
+                          icon: const Icon(
+                            Icons.call,
+                            size: 22,
+                            color: Colors.white,
+                          ),
+                          label: const Text(
+                            "Call Driver",
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+              ),
+            )
           ],
         ));
   }
