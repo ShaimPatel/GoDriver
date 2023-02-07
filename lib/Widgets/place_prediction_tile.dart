@@ -5,14 +5,20 @@ import 'package:users_app/Widgets/progess_dialog.dart';
 import 'package:users_app/assistant/request_assistant.dart';
 import 'package:users_app/models/direction.dart';
 import 'package:users_app/models/predicted_places.dart';
+import 'package:users_app/screens/global/global.dart';
 import 'package:users_app/screens/global/map_key.dart';
 
-class PlacePredictionTileDesign extends StatelessWidget {
+class PlacePredictionTileDesign extends StatefulWidget {
   const PlacePredictionTileDesign({super.key, this.predictedPlaces});
   final PredictedPlaces? predictedPlaces;
 
-  //! Here are getPlaceDirectionDetails..
+  @override
+  State<PlacePredictionTileDesign> createState() =>
+      _PlacePredictionTileDesignState();
+}
 
+class _PlacePredictionTileDesignState extends State<PlacePredictionTileDesign> {
+  //! Here are getPlaceDirectionDetails..
   getPlaceDirectionDetails(String placeId, context) async {
     showDialog(
         context: context,
@@ -24,6 +30,7 @@ class PlacePredictionTileDesign extends StatelessWidget {
 
     var responseAPI =
         await RequestAssistant.receiveRequest(placeDirectionDetailsURL);
+
     Navigator.pop(context);
 
     if (responseAPI == "Error Occured, Failed No Response.") {
@@ -41,7 +48,9 @@ class PlacePredictionTileDesign extends StatelessWidget {
 
       Provider.of<AppInfo>(context, listen: false)
           .updateDropOffLocationAddress(directions);
-
+      setState(() {
+        userDropOffAddress = directions.locationName!;
+      });
       Navigator.pop(context, "obtainedDropoff");
     }
   }
@@ -50,7 +59,7 @@ class PlacePredictionTileDesign extends StatelessWidget {
   Widget build(BuildContext context) {
     return ElevatedButton(
       onPressed: () {
-        getPlaceDirectionDetails(predictedPlaces!.placeId!, context);
+        getPlaceDirectionDetails(widget.predictedPlaces!.placeId!, context);
       },
       style: ElevatedButton.styleFrom(backgroundColor: Colors.white24),
       child: Padding(
@@ -68,7 +77,7 @@ class PlacePredictionTileDesign extends StatelessWidget {
                 children: [
                   const SizedBox(height: 8.0),
                   Text(
-                    predictedPlaces!.mainText!,
+                    widget.predictedPlaces!.mainText!,
                     overflow: TextOverflow.ellipsis,
                     maxLines: 2,
                     style: const TextStyle(
@@ -78,7 +87,7 @@ class PlacePredictionTileDesign extends StatelessWidget {
                   ),
                   const SizedBox(height: 2.0),
                   Text(
-                    predictedPlaces!.secondaryText!,
+                    widget.predictedPlaces!.secondaryText!,
                     overflow: TextOverflow.ellipsis,
                     maxLines: 2,
                     style: const TextStyle(

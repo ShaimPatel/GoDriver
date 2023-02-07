@@ -1,1 +1,3 @@
 const String mapKey = 'AIzaSyBSy-z4F88Yk7zhjCBdCYiZnVpE1tDKWLY';
+const String cloudMessaingServerToken =
+    'AAAAIe9r5aM:APA91bEfanpoZTVr54n0ez6jabhez2MxuWajehttoA7IYCv9zCzOi6hl82nOoxDYixdLVQILEnHiXBdq5hiqbxOkJ25bAzo4zWzfbt1fcxdTmTVVdnJp-bJMbOUTwwHMa0FiEgq34aZQ';

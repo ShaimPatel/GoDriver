@@ -597,6 +597,29 @@ class MainScreenState extends State<MainScreen> {
         .set(referenceRideRequest!.key);
 
     //?Automate the push notification..
+
+    FirebaseDatabase.instance
+        .ref()
+        .child("drivers")
+        .child(selectedDriverId)
+        .child("token")
+        .once()
+        .then((snap) {
+      if (snap.snapshot.value != null) {
+        String deviceRegistrationToken = snap.snapshot.value.toString();
+
+        //? Send Notification Here..
+        AssistantMethods.sendNotificationToDriverNow(
+          deviceRegistrationToken,
+          referenceRideRequest!.key!,
+          context,
+        );
+        Fluttertoast.showToast(msg: "Notificatin send Successfully.");
+      } else {
+        Fluttertoast.showToast(msg: "Please Choose another Driver..");
+        return;
+      }
+    });
   }
 
 //todo: When Driver are Active

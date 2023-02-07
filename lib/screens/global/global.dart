@@ -11,3 +11,5 @@ UserModel? userModelCurrentInfo;
 List dList = [];
 DirectionDetailsInfo? tripdirectionDetailsInfo;
 String? selectedDriverId;
+
+String userDropOffAddress = '';
