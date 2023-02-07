@@ -4,6 +4,7 @@ import 'dart:async';
 
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_geofire/flutter_geofire.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -608,12 +609,42 @@ class MainScreenState extends State<MainScreen> {
       if (snap.snapshot.value != null) {
         String deviceRegistrationToken = snap.snapshot.value.toString();
 
-        //? Send Notification Here..
+        //? Send Notification Here :: Push Notification
         AssistantMethods.sendNotificationToDriverNow(
           deviceRegistrationToken,
           referenceRideRequest!.key!,
           context,
         );
+        //todo: Display waiting Response Ui from Driver
+
+        //todo: Response  From Driver .
+
+        FirebaseDatabase.instance
+            .ref()
+            .child("drivers")
+            .child(selectedDriverId)
+            .child("newRideStatus")
+            .onValue
+            .listen((eventSnapshot) {
+          //!Driver can  Cancle The RideRequest :: Push Notification
+          //!(newRideReuest == "idle")
+          if (eventSnapshot.snapshot.value == "idle") {
+            Fluttertoast.showToast(
+                msg:
+                    "Driver has cancle your request , Please choose another driver.");
+            Future.delayed(const Duration(seconds: 2), () {
+              Fluttertoast.showToast(msg: "Restaring Your App..");
+              SystemNavigator.pop();
+            });
+          }
+          //Driver accept tge rideRequest ::  Push Notification
+          //(newRideReuest == "accepted")
+          if (eventSnapshot.snapshot.value == "accepted") {
+            //Design And Display UI.. assigned Driver Information..
+
+          }
+        });
+
         Fluttertoast.showToast(msg: "Notificatin send Successfully.");
       } else {
         Fluttertoast.showToast(msg: "Please Choose another Driver..");
