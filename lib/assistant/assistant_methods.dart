@@ -17,7 +17,7 @@ import 'package:http/http.dart' as http;
 import 'package:users_app/screens/global/map_key.dart';
 
 class AssistantMethods {
-//todo: ->  Funcation for searchAddressForGeographicCordinates..
+//todo ::->  Funcation for search Address For Geo Graphic Cordinates..
   static Future<String> searchAddressForGeographicCordinates(
       Position position, context) async {
     String apiURL =
@@ -37,7 +37,7 @@ class AssistantMethods {
     return humanReadableAddress;
   }
 
-//todo: Read Current Online Information Drivers..
+//todo ::-> Read Current Online Information Drivers..
   static void readCurrentOnLineInfo() async {
     currentFirebaseUser = FirebaseAuth.instance.currentUser;
     DatabaseReference userRef = FirebaseDatabase.instance
@@ -53,7 +53,7 @@ class AssistantMethods {
     });
   }
 
-//todo: -> Start to End Direction details
+//todo ::-> Start to End Direction details
   static Future<DirectionDetailsInfo?> obtainedOriginToDestinationDetails(
       LatLng originPosition, LatLng destinationPosition) async {
     String urlOriginToDestination =
@@ -84,7 +84,7 @@ class AssistantMethods {
     return directionDetailsInfo;
   }
 
-//todo : Calculate Fare Amount from Origin to Destination
+//todo ::-> Calculate Fare Amount from Origin to Destination
   static double calculateFareAmountFronOriginToDestination(
       DirectionDetailsInfo directionDetailsInfo) {
     double timeTravelrdFareAmountPerMinute =
@@ -100,7 +100,7 @@ class AssistantMethods {
     return double.parse(localCurrancyTotalFare.toStringAsFixed(1));
   }
 
-//todo: Send notification to driver now..!
+//todo ::-> Send notification to driver now..!
   static sendNotificationToDriverNow(String deviceRegistrationToken,
       String userRideRequestId, BuildContext context) async {
     var destinationAddress = userDropOffAddress;
