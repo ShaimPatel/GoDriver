@@ -625,6 +625,8 @@ class MainScreenState extends State<MainScreen> {
                   textColor: Colors.red,
                   gravity: ToastGravity.BOTTOM);
             }
+            referenceRideRequest!.onDisconnect();
+            tripRideRequestInfoStreamSubscription!.cancel();
           }
         }
       }

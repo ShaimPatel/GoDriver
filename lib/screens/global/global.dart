@@ -16,3 +16,4 @@ String driverPhone = '';
 String driverName = '';
 String userDropOffAddress = '';
 double countRatingstar = 0.0;
+String titleStarRating = 'All Is Ok';
