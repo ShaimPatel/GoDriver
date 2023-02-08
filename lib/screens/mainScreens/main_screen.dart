@@ -54,7 +54,9 @@ class MainScreenState extends State<MainScreen> {
   String userName = 'Your Name..!';
   String userEmail = 'xyz@gmail.com';
   bool activeNearbyDriverKeysLoded = false;
+  String userRideRequestStatus = "";
   bool openNavigationDrawer = true;
+  bool requestPositionInfo = true;
 
   GoogleMapController? newGoogleMapController;
   BitmapDescriptor? activeNearbyIcon;
@@ -562,10 +564,87 @@ class MainScreenState extends State<MainScreen> {
           driverName = (eventSnap.snapshot.value as Map)['driverName'];
         });
       }
+
+      //?
+      if ((eventSnap.snapshot.value as Map)['status'] != null) {
+        userRideRequestStatus =
+            (eventSnap.snapshot.value as Map)['status'].toString();
+      }
+      if ((eventSnap.snapshot.value as Map)['driverLocation'] != null) {
+        double driverCurrentPositionLat = double.parse(
+            (eventSnap.snapshot.value as Map)['driverLocation']['latitude']
+                .toString());
+        double driverCurrentPositionLng = double.parse(
+            (eventSnap.snapshot.value as Map)['driverLocation']['longitude']
+                .toString());
+
+        LatLng driverCurrentPositionLatLng =
+            LatLng(driverCurrentPositionLat, driverCurrentPositionLng);
+
+        //? status :: accepted
+        if (userRideRequestStatus == "accepted") {
+          updateArrivalTimeToUserPickUpLocation(driverCurrentPositionLatLng);
+        }
+        //? status :: arrived
+        if (userRideRequestStatus == "arrived") {
+          driverRideStatus = "Driver has Arrived";
+        }
+        //? status :: ontrip
+        if (userRideRequestStatus == "onTrip") {
+          updateReachingTimeToUserDropOffLocation(driverCurrentPositionLatLng);
+        }
+      }
     });
     onlineNearbyAvailableDriversList =
         GeoFireAssistant.activeNearbyAvilableDriversList;
     searchNearstOnlineDrivers();
+  }
+
+//todo:
+  updateArrivalTimeToUserPickUpLocation(driverCurrentPositionLatLng) async {
+    if (requestPositionInfo == true) {
+      requestPositionInfo = false;
+
+      LatLng userPickUpPosition =
+          LatLng(userCurrantPosition!.latitude, userCurrantPosition!.longitude);
+
+      var directionDetailsInfo =
+          await AssistantMethods.obtainedOriginToDestinationDetails(
+              driverCurrentPositionLatLng, userPickUpPosition);
+      if (directionDetailsInfo == null) {
+        return;
+      }
+      setState(() {
+        driverRideStatus =
+            "Driver id comming :: ${directionDetailsInfo.durationText.toString()}";
+      });
+      requestPositionInfo = true;
+    }
+  }
+
+//todo :: Update reaching Time to User Drop off Location
+  updateReachingTimeToUserDropOffLocation(driverCurrentPositionLatLng) async {
+    if (requestPositionInfo == true) {
+      requestPositionInfo = false;
+      var userdropOffLocation =
+          Provider.of<AppInfo>(context, listen: false).userDropOffLocation;
+      LatLng userDestinationPosition = LatLng(
+        userdropOffLocation!.locationLatitude!,
+        userdropOffLocation.locationLongitude!,
+      );
+
+      var directionDetailsInfo =
+          await AssistantMethods.obtainedOriginToDestinationDetails(
+              driverCurrentPositionLatLng, userDestinationPosition);
+      if (directionDetailsInfo == null) {
+        return;
+      }
+      setState(() {
+        driverRideStatus =
+            "Going toward Destination :: ${directionDetailsInfo.durationText.toString()}";
+      });
+      requestPositionInfo = true;
+    }
   }
 
 //todo: Search Near Online Drivers..
@@ -987,8 +1066,9 @@ class MainScreenState extends State<MainScreen> {
                       Center(
                         child: Text(
                           driverRideStatus,
+                          overflow: TextOverflow.ellipsis,
                           style: const TextStyle(
-                            fontSize: 23,
+                            fontSize: 16,
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
                           ),
