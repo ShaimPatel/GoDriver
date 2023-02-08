@@ -15,11 +15,13 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:users_app/InfoHandler/app_info.dart';
 import 'package:users_app/Widgets/my_drawer.dart';
+import 'package:users_app/Widgets/pay_fare_amount_dialog.dart';
 import 'package:users_app/Widgets/progess_dialog.dart';
 import 'package:users_app/assistant/assistant_methods.dart';
 import 'package:users_app/assistant/geofire_assistant.dart';
 import 'package:users_app/models/active_nearby_avilable_drivers.dart';
 import 'package:users_app/screens/global/global.dart';
+import 'package:users_app/screens/mainScreens/rate_driver_screen.dart';
 import 'dart:developer' as developer;
 
 import 'package:users_app/screens/mainScreens/search_places_screen.dart';
@@ -509,7 +511,7 @@ class MainScreenState extends State<MainScreen> {
   }
 
 //todo:->  Save Ride Request Infromation ..
-  saveRideRequestInformation() {
+  saveRideRequestInformation() async {
     referenceRideRequest = FirebaseDatabase.instance
         .ref()
         .child("All Ride Request")
@@ -545,7 +547,7 @@ class MainScreenState extends State<MainScreen> {
 
     referenceRideRequest!.set(userInformationMap);
     tripRideRequestInfoStreamSubscription =
-        referenceRideRequest!.onValue.listen((eventSnap) {
+        referenceRideRequest!.onValue.listen((eventSnap) async {
       if (eventSnap.snapshot.value == null) {
         return;
       }
@@ -592,6 +594,38 @@ class MainScreenState extends State<MainScreen> {
         //? status :: ontrip
         if (userRideRequestStatus == "onTrip") {
           updateReachingTimeToUserDropOffLocation(driverCurrentPositionLatLng);
+        }
+        //? status :: ended
+        if (userRideRequestStatus == "ended") {
+          if ((eventSnap.snapshot.value as Map)['fareAmount'] != null) {
+            double fareAmount =
+                double.parse((eventSnap.snapshot.value as Map)['fareAmount']);
+            var response = await showDialog(
+              context: context,
+              barrierDismissible: false,
+              builder: (BuildContext context) =>
+                  PayFareAmountDialog(fareAmount: fareAmount),
+            );
+            if (response.toString().contains("cashPayed")) {
+              //? ::  user Can Rate To the Driver..
+              if ((eventSnap.snapshot.value as Map)['driverID'] != null) {
+                var assignedDriverId =
+                    (eventSnap.snapshot.value as Map)['driverID'];
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (c) =>
+                          RateDriverScreen(assignedDriverId: assignedDriverId),
+                    ));
+              }
+
+              Fluttertoast.showToast(
+                  msg: "Rate Page ",
+                  backgroundColor: Colors.green,
+                  textColor: Colors.red,
+                  gravity: ToastGravity.BOTTOM);
+            }
+          }
         }
       }
     });
