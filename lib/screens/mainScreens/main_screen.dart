@@ -189,6 +189,7 @@ class MainScreenState extends State<MainScreen> {
     developer.log(humanReadableAddress);
 
     initalizationGeoFireListener();
+    AssistantMethods.readTripKeysForOnlineUsers(context);
   }
 
 //todo: ->  Black Theme Google map

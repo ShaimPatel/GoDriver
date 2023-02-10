@@ -1,7 +1,9 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first, must_be_immutable, library_private_types_in_public_api
+
 import 'package:flutter/material.dart';
 
 import 'package:users_app/screens/global/global.dart';
+import 'package:users_app/screens/mainScreens/trips_history_screen.dart';
 
 import '../screens/splash/splash_screen.dart';
 
@@ -78,7 +80,14 @@ class _MyDrawerState extends State<MyDrawer> {
 
             //drawer body
             GestureDetector(
-              onTap: () {},
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (c) => const TripsHistoryScreen(),
+                  ),
+                );
+              },
               child: const ListTile(
                 leading: Icon(
                   Icons.history,
