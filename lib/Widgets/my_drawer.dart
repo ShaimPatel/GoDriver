@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:users_app/screens/global/global.dart';
+import 'package:users_app/screens/mainScreens/about_screen.dart';
 import 'package:users_app/screens/mainScreens/profile_screen.dart';
 import 'package:users_app/screens/mainScreens/trips_history_screen.dart';
 
@@ -68,22 +69,17 @@ class _MyDrawerState extends State<MyDrawer> {
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: const TextStyle(
-                            fontSize: 15,
-                            color: Colors.black,
-                            fontWeight: FontWeight.bold,
-                          ),
+                              fontSize: 15,
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold),
                         ),
-                        const SizedBox(
-                          height: 2,
-                        ),
+                        const SizedBox(height: 2),
                         Text(
                           widget.email.toString(),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: const TextStyle(
-                            fontSize: 10,
-                            color: Colors.black45,
-                          ),
+                              fontSize: 10, color: Colors.black45),
                         ),
                       ],
                     ),
@@ -167,7 +163,13 @@ class _MyDrawerState extends State<MyDrawer> {
                     color: Colors.blue[100],
                   ),
                   GestureDetector(
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (c) => AboutScreen(),
+                          ));
+                    },
                     child: ListTile(
                       leading: Icon(
                         Icons.info,
