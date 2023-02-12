@@ -26,10 +26,6 @@ class HomeTabPage extends StatefulWidget {
 class _HomeTabPageState extends State<HomeTabPage> {
 //! Initilization Section...***
 
-  String statusText = "Now Offline";
-  Color buttonsColor = Colors.grey;
-  bool isDriverActive = false;
-
   var geoLocator = Geolocator();
   GoogleMapController? newGoogleMapController;
   LocationPermission? _locationPermission;
@@ -66,6 +62,8 @@ class _HomeTabPageState extends State<HomeTabPage> {
     String humanReadableAddress =
         await AssistantMethods.searchAddressForGeographicCordinates(
             driverCurrantPosition!, context);
+
+    AssistantMethods.readDriverAvarageRatings(context);
   }
 
 //todo:  Read Current Drivers Infomation..
@@ -102,7 +100,7 @@ class _HomeTabPageState extends State<HomeTabPage> {
     pushNotificationSystem.initializationCloudMessaging(context);
     pushNotificationSystem.generateAndGetToken();
 
-    AssistantMethods.readDriverEarning(context);
+    AssistantMethods.readDriverAvarageRatings(context);
   }
 
 //todo: ->  For Driver Online or Offline

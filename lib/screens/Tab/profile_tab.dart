@@ -1,9 +1,11 @@
 import 'package:driver_app/global/global.dart';
-import 'package:driver_app/screens/splash/splash_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+
+import '../../Widgets/info_design_ui.dart';
 
 class ProfileTabPage extends StatefulWidget {
-  const ProfileTabPage({super.key});
+  const ProfileTabPage({Key? key}) : super(key: key);
 
   @override
   State<ProfileTabPage> createState() => _ProfileTabPageState();
@@ -12,14 +14,83 @@ class ProfileTabPage extends StatefulWidget {
 class _ProfileTabPageState extends State<ProfileTabPage> {
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: ElevatedButton(
-          onPressed: () {
-            firebaseAuth.signOut();
-            Navigator.push(context,
-                MaterialPageRoute(builder: (c) => const MySplashScreen()));
-          },
-          child: const Text("SignOut ")),
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: SafeArea(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            //name
+            Text(
+              driverData.name!,
+              style: const TextStyle(
+                fontSize: 50.0,
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+
+            Text(
+              "$titleStarRating driver",
+              style: const TextStyle(
+                fontSize: 18.0,
+                color: Colors.grey,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+
+            const SizedBox(
+              height: 20,
+              width: 200,
+              child: Divider(
+                color: Colors.white,
+                height: 2,
+                thickness: 2,
+              ),
+            ),
+
+            const SizedBox(
+              height: 38.0,
+            ),
+
+            //phone
+            InfoDesignUIWidget(
+              textInfo: driverData.phone!,
+              iconData: Icons.phone_iphone,
+            ),
+
+            //email
+            InfoDesignUIWidget(
+              textInfo: driverData.email!,
+              iconData: Icons.email,
+            ),
+
+            InfoDesignUIWidget(
+              textInfo:
+                  "${driverData.carColor!} ${driverData.carModel!} ${driverData.carNumber!}",
+              iconData: Icons.car_repair,
+            ),
+
+            const SizedBox(
+              height: 20,
+            ),
+
+            ElevatedButton(
+              onPressed: () {
+                firebaseAuth.signOut();
+                SystemNavigator.pop();
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.redAccent,
+              ),
+              child: const Text(
+                "Logout",
+                style: TextStyle(color: Colors.white),
+              ),
+            )
+          ],
+        ),
+      ),
     );
   }
 }

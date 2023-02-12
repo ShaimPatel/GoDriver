@@ -199,4 +199,22 @@ class AssistantMethods {
     });
     readTripKeysForOnlineDrivers(context);
   }
+
+//todo :: Rating For Online Drivers
+
+  static void readDriverAvarageRatings(BuildContext context) {
+    FirebaseDatabase.instance
+        .ref()
+        .child("drivers")
+        .child(firebaseAuth.currentUser!.uid)
+        .child("rating")
+        .once()
+        .then((snap) {
+      if (snap.snapshot.value != null) {
+        String avarageRating = snap.snapshot.value.toString();
+        Provider.of<AppInfo>(context, listen: false)
+            .updateDriverAvarageRating(avarageRating);
+      }
+    });
+  }
 }

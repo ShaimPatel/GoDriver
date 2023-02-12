@@ -36,30 +36,13 @@ class _MainScreenState extends State<MainScreen>
       body: TabBarView(
         physics: const NeverScrollableScrollPhysics(),
         controller: tabController,
-        children: const [
-          HomeTabPage(),
-          EarningsTabPage(),
+        children: [
+           HomeTabPage(),
+           EarningsTabPage(),
           RatingsTabPage(),
-          ProfileTabPage()
+           ProfileTabPage()
         ],
       ),
-      // bottomNavigationBar: BottomNavigationBar(
-      //   items: const [
-      //     BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
-      //     BottomNavigationBarItem(
-      //         icon: Icon(Icons.credit_card), label: "Earnings"),
-      //     BottomNavigationBarItem(icon: Icon(Icons.star), label: "Ratings"),
-      //     BottomNavigationBarItem(icon: Icon(Icons.person), label: "Account"),
-      //   ],
-      //   unselectedItemColor: Colors.white54,
-      //   selectedItemColor: Colors.white,
-      //   backgroundColor: Colors.black,
-      //   type: BottomNavigationBarType.fixed,
-      //   selectedLabelStyle: const TextStyle(fontSize: 14),
-      //   showUnselectedLabels: true,
-      //   currentIndex: selectedIndex,
-      //   onTap: onItemClicked,
-      // ),
       bottomNavigationBar: SalomonBottomBar(
         currentIndex: selectedIndex,
         onTap: onItemClicked,

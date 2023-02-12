@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:assets_audio_player/assets_audio_player.dart';
 import 'package:driver_app/models/user_model.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 
 import '../models/driver_data.dart';
@@ -16,3 +17,7 @@ AssetsAudioPlayer audioPlayer = AssetsAudioPlayer();
 Position? driverCurrantPosition;
 DriverData driverData = DriverData();
 String? driverVehicleType = "";
+String titleStarRating = "Good";
+Color buttonsColor = Colors.grey;
+bool isDriverActive = false;
+String statusText = "Now Offline";
