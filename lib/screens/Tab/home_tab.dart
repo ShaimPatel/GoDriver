@@ -101,6 +101,8 @@ class _HomeTabPageState extends State<HomeTabPage> {
     PushNotificationSystem pushNotificationSystem = PushNotificationSystem();
     pushNotificationSystem.initializationCloudMessaging(context);
     pushNotificationSystem.generateAndGetToken();
+
+    AssistantMethods.readDriverEarning(context);
   }
 
 //todo: ->  For Driver Online or Offline

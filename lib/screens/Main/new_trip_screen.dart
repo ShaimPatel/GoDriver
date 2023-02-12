@@ -332,7 +332,8 @@ class _NewTripScreenState extends State<NewTripScreen> {
     saveFareAmountToDriverEarnings(totalFareAmount);
   }
 
-//todo:
+//todo ::  Save Fare Amount To Driver Earning ..
+
   saveFareAmountToDriverEarnings(double totalFareAmount) {
     FirebaseDatabase.instance
         .ref()
