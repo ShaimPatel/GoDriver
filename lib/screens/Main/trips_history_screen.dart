@@ -15,9 +15,9 @@ class _TripsHistoryScreenState extends State<TripsHistoryScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.blue[100],
+      backgroundColor: Colors.green[100],
       appBar: AppBar(
-        backgroundColor: Colors.blue[100],
+        backgroundColor: Colors.green[100],
         elevation: 0,
         title: const Text(
           "Trips History",

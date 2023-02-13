@@ -9,7 +9,7 @@ class AppInfo extends ChangeNotifier {
   List<String> historyTripKeyList = [];
   List<TripHistotyModel> allTripsHistoryInformationList = [];
   String driverTotalEarnins = "0";
-  String driverRatings = "0";
+  String driverAvarageRatings = "0";
 
 //todo ::-> Update Pick Up Location Address.. Using Provider .
 
@@ -46,12 +46,12 @@ class AppInfo extends ChangeNotifier {
   //todo:
   updateDriverTotalEarnings(String totalEarnig) {
     driverTotalEarnins = totalEarnig;
-    // notifyListeners();
+    notifyListeners();
   }
 
   //todo ::
-  updateDriverAvarageRating(String avarageRating) {
-    driverRatings = avarageRating;
-    // notifyListeners();
+  updateDriverAvarageRating(String driverRating) {
+    driverAvarageRatings = driverRating;
+    notifyListeners();
   }
 }

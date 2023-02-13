@@ -63,7 +63,7 @@ class _HomeTabPageState extends State<HomeTabPage> {
         await AssistantMethods.searchAddressForGeographicCordinates(
             driverCurrantPosition!, context);
 
-    AssistantMethods.readDriverAvarageRatings(context);
+    AssistantMethods.readDriverRatings(context);
   }
 
 //todo:  Read Current Drivers Infomation..
@@ -100,7 +100,7 @@ class _HomeTabPageState extends State<HomeTabPage> {
     pushNotificationSystem.initializationCloudMessaging(context);
     pushNotificationSystem.generateAndGetToken();
 
-    AssistantMethods.readDriverAvarageRatings(context);
+    AssistantMethods.readDriverEarning(context);
   }
 
 //todo: ->  For Driver Online or Offline

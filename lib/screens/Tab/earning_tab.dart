@@ -17,7 +17,7 @@ class _EarningsTabPageState extends State<EarningsTabPage> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Colors.grey,
+      color: Colors.green[100],
       child: Column(
         children: [
           //earnings
@@ -29,17 +29,18 @@ class _EarningsTabPageState extends State<EarningsTabPage> {
               child: Column(
                 children: [
                   const Text(
-                    "Your Earnings:",
+                    "Your Earnings : ",
                     style: TextStyle(
                       color: Colors.grey,
-                      fontSize: 16,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                   const SizedBox(
                     height: 10,
                   ),
                   Text(
-                    "\$ ${Provider.of<AppInfo>(context, listen: false).driverTotalEarnins}",
+                    "₹ ${Provider.of<AppInfo>(context, listen: false).driverTotalEarnins}",
                     style: const TextStyle(
                       color: Colors.grey,
                       fontSize: 60,
@@ -52,48 +53,56 @@ class _EarningsTabPageState extends State<EarningsTabPage> {
           ),
 
           //total number of trips
-          ElevatedButton(
-            onPressed: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (c) => const TripsHistoryScreen()));
-            },
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.white54),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-              child: Row(
-                children: [
-                  Image.asset(
-                    "assets/images/car_logo.png",
-                    width: 100,
-                  ),
-                  const SizedBox(
-                    width: 6,
-                  ),
-                  const Text(
-                    "Trips Completed",
-                    style: TextStyle(
-                      color: Colors.black54,
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (c) => const TripsHistoryScreen()));
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.white,
+              ),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 20,
+                ),
+                child: Row(
+                  children: [
+                    Image.asset(
+                      "assets/images/car_logo.png",
+                      width: 100,
                     ),
-                  ),
-                  Expanded(
-                    child: Container(
-                      child: Text(
-                        Provider.of<AppInfo>(context, listen: false)
-                            .allTripsHistoryInformationList
-                            .length
-                            .toString(),
-                        textAlign: TextAlign.end,
-                        style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
+                    const SizedBox(
+                      width: 6,
+                    ),
+                    const Text(
+                      "Trips Completed",
+                      style: TextStyle(
+                        color: Colors.black54,
+                      ),
+                    ),
+                    Expanded(
+                      child: Container(
+                        child: Text(
+                          Provider.of<AppInfo>(context, listen: false)
+                              .allTripsHistoryInformationList
+                              .length
+                              .toString(),
+                          textAlign: TextAlign.end,
+                          style: const TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),

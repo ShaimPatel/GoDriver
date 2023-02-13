@@ -202,7 +202,7 @@ class AssistantMethods {
 
 //todo :: Rating For Online Drivers
 
-  static void readDriverAvarageRatings(BuildContext context) {
+  static void readDriverRatings(BuildContext context) {
     FirebaseDatabase.instance
         .ref()
         .child("drivers")
@@ -211,9 +211,9 @@ class AssistantMethods {
         .once()
         .then((snap) {
       if (snap.snapshot.value != null) {
-        String avarageRating = snap.snapshot.value.toString();
+        String driverRating = snap.snapshot.value.toString();
         Provider.of<AppInfo>(context, listen: false)
-            .updateDriverAvarageRating(avarageRating);
+            .updateDriverAvarageRating(driverRating);
       }
     });
   }

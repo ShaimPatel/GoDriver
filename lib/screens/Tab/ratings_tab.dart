@@ -34,7 +34,8 @@ class _RatingsTabPageState extends State<RatingsTabPage> {
   //todo ::
   getRatingNumber() {
     setState(() {
-      ratingnumbers = double.parse(Provider.of<AppInfo>(context).driverRatings);
+      ratingnumbers = double.parse(
+          Provider.of<AppInfo>(context, listen: false).driverAvarageRatings);
     });
     setUpRatingTitle();
   }
@@ -72,13 +73,16 @@ class _RatingsTabPageState extends State<RatingsTabPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      extendBody: true,
+      backgroundColor: Colors.green[100],
       body: Dialog(
+        elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(14),
         ),
         backgroundColor: Colors.transparent,
         child: Container(
+          height: 250,
           margin: const EdgeInsets.all(8),
           decoration: BoxDecoration(
             color: Colors.white,
@@ -88,22 +92,22 @@ class _RatingsTabPageState extends State<RatingsTabPage> {
             mainAxisSize: MainAxisSize.min,
             children: [
               const Padding(
-                padding: EdgeInsets.all(8.0),
+                padding: EdgeInsets.symmetric(vertical: 20, horizontal: 10),
                 child: Text(
                   "Your Ratings ",
                   style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
-                    color: Colors.black54,
+                    color: Colors.black,
                   ),
                 ),
               ),
-              const SizedBox(height: 12),
               const Divider(
                 thickness: 4,
                 height: 2,
                 indent: 15,
                 endIndent: 15,
+                color: Colors.black54,
               ),
               const SizedBox(height: 22),
               SmoothStarRating(
@@ -111,19 +115,19 @@ class _RatingsTabPageState extends State<RatingsTabPage> {
                 allowHalfRating: false,
                 starCount: 5,
                 size: 46,
-                color: Colors.green,
-                borderColor: Colors.green,
+                color: Colors.orangeAccent,
+                borderColor: Colors.yellowAccent,
               ),
               const SizedBox(height: 12),
               Text(
-                titleStarRating,
+                "Yor are a $titleStarRating Driver",
+                maxLines: 2,
                 style: const TextStyle(
-                  fontSize: 25,
+                  fontSize: 20,
                   color: Colors.green,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              const SizedBox(height: 10),
             ],
           ),
         ),
