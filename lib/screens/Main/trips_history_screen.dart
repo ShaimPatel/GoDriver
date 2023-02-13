@@ -12,6 +12,7 @@ class TripsHistoryScreen extends StatefulWidget {
 }
 
 class _TripsHistoryScreenState extends State<TripsHistoryScreen> {
+//! UI Section -- :: --
   @override
   Widget build(BuildContext context) {
     return Scaffold(

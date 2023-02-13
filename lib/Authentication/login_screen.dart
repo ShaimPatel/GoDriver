@@ -17,9 +17,15 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+//! Initization Section --- :: ---
+
   TextEditingController emailTextEditingController = TextEditingController();
   TextEditingController passwordTextEditingController = TextEditingController();
+  late VideoPlayerController _controller;
 
+//! Funcation/ Method Section -- :: ---
+
+//todo :: Validation for Feaild ..!
   validateForm() {
     if (!emailTextEditingController.text.contains("@")) {
       return Fluttertoast.showToast(
@@ -44,7 +50,7 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  //!
+//todo :: Login Driver Now ..!
   loginDriverNow() async {
     showDialog(
         context: context,
@@ -95,11 +101,13 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  late VideoPlayerController _controller;
+//! InitState -- :: --
   @override
   void initState() {
     super.initState();
   }
+
+//! Dispose -- :: --
 
   @override
   void dispose() {
@@ -107,6 +115,7 @@ class _LoginScreenState extends State<LoginScreen> {
     _controller.dispose();
   }
 
+//! UI Section -- :: --
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -171,8 +180,8 @@ class _LoginScreenState extends State<LoginScreen> {
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.lightGreenAccent,
                         ),
-                        child: const Text("Create Account",
-                            style: TextStyle(
+                        child: Text("Login".toUpperCase(),
+                            style: const TextStyle(
                                 color: Colors.black54, fontSize: 18))),
                     const SizedBox(height: 10),
                     TextButton(
@@ -183,7 +192,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   builder: (context) => const SignUpScreen()));
                         },
                         child: const Text(
-                          "Don't have a Account? Create Here..!",
+                          "Don't have any Account? Create Here..!",
                           style: TextStyle(color: Colors.grey),
                         ))
                   ],

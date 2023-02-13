@@ -1,4 +1,6 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
+
+//! This Model is for User Ride Request  Information -- :: --
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class UserRideRequestInformation {

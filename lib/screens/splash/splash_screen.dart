@@ -13,11 +13,13 @@ class MySplashScreen extends StatefulWidget {
 }
 
 class _MySplashScreenState extends State<MySplashScreen> {
-  //? Time
+//! Funcation Section -- :: --
+
+  //todo  ::  Start Time -- :: --
   void startTimer() {
     Timer(const Duration(seconds: 3), () async {
       if (firebaseAuth.currentUser != null) {
-        //!Send  user to home screen..!
+        //! Send  user to home screen..! -- :: --
         Navigator.push(
             context, MaterialPageRoute(builder: (c) => const MainScreen()));
       } else {
@@ -27,11 +29,15 @@ class _MySplashScreenState extends State<MySplashScreen> {
     });
   }
 
+  //! InitState -- :: --
+
   @override
   void initState() {
     super.initState();
     startTimer();
   }
+
+  //! UI Section -- :: --
 
   @override
   Widget build(BuildContext context) {

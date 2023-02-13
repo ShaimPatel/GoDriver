@@ -23,8 +23,12 @@ class NotificationDialogBox extends StatefulWidget {
 }
 
 class _NotificationDialogBoxState extends State<NotificationDialogBox> {
-//todo: Accept Ride Request..!
+//! Initlazation Section -- :: --
   String getRideRequestID = '';
+
+//! Funaction/Method Section -- :: --
+
+//todo ::  Accept Ride Request -- :: --
 
   acceptRideRequest(BuildContext context) {
     FirebaseDatabase.instance
@@ -67,6 +71,7 @@ class _NotificationDialogBoxState extends State<NotificationDialogBox> {
     });
   }
 
+//! UI Section -- :: --
   @override
   Widget build(BuildContext context) {
     return Dialog(

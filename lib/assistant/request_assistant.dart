@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class RequestAssistant {
+//todo :: This ReceiceRequest Function to get The Api from servera and display it..Response..!
+
   static Future<dynamic> receiveRequest(String url) async {
     http.Response httpResponse = await http.get(Uri.parse(url));
     try {

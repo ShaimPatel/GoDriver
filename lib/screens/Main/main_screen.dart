@@ -14,8 +14,11 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen>
     with SingleTickerProviderStateMixin {
+//! Initlazation Section -- :: --
   TabController? tabController;
   int selectedIndex = 0;
+
+//! Funcation/Method Section  -- :: --
 
   onItemClicked(int index) {
     setState(() {
@@ -24,12 +27,14 @@ class _MainScreenState extends State<MainScreen>
     });
   }
 
+//! InitState  -- :: --
   @override
   void initState() {
     super.initState();
     tabController = TabController(length: 4, vsync: this);
   }
 
+//! UI Section -- :: --
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -37,10 +42,10 @@ class _MainScreenState extends State<MainScreen>
         physics: const NeverScrollableScrollPhysics(),
         controller: tabController,
         children: [
-           HomeTabPage(),
-           EarningsTabPage(),
+          const HomeTabPage(),
+          const EarningsTabPage(),
           RatingsTabPage(),
-           ProfileTabPage()
+          const ProfileTabPage()
         ],
       ),
       bottomNavigationBar: SalomonBottomBar(

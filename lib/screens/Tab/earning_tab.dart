@@ -14,6 +14,7 @@ class EarningsTabPage extends StatefulWidget {
 }
 
 class _EarningsTabPageState extends State<EarningsTabPage> {
+//! UI Section -- :: --
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -52,7 +53,7 @@ class _EarningsTabPageState extends State<EarningsTabPage> {
             ),
           ),
 
-          //total number of trips
+          // total number of trips-- :: --
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: ElevatedButton(

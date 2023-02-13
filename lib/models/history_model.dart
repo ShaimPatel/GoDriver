@@ -1,4 +1,7 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
+
+//! This Model Is for Trips History  Information -- :: --
+
 import 'package:firebase_database/firebase_database.dart';
 
 class TripHistotyModel {
@@ -18,6 +21,8 @@ class TripHistotyModel {
     this.userName,
     this.userPhone,
   });
+
+//todo :: To adding into the Database -- :: --
 
   TripHistotyModel.fromSnapshot(DataSnapshot dataSnapshot) {
     time = (dataSnapshot.value as Map)["time"];

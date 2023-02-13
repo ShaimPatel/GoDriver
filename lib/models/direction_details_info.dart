@@ -1,3 +1,5 @@
+//! This Model Is for Direction Details Information -- :: --
+
 class DirectionDetailsInfo {
   int? distanceValue;
   int? durationValue;

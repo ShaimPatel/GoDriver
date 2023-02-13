@@ -8,16 +8,22 @@ import 'package:geolocator/geolocator.dart';
 
 import '../models/driver_data.dart';
 
+//! Global Variable . To Access Glovaly to It -- :: --
+
 final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
-User? currentFirebaseUser;
-DriverModel? driverModelCurrentInfo;
 late StreamSubscription<Position> streamSubscription;
 late StreamSubscription<Position> streamSubscriptionDriverLivePosition;
-AssetsAudioPlayer audioPlayer = AssetsAudioPlayer();
+
+User? currentFirebaseUser;
+DriverModel? driverModelCurrentInfo;
 Position? driverCurrantPosition;
+
+AssetsAudioPlayer audioPlayer = AssetsAudioPlayer();
 DriverData driverData = DriverData();
-String? driverVehicleType = "";
+
+String statusText = "Now Offline";
 String titleStarRating = "Good";
+String? driverVehicleType = "";
+
 Color buttonsColor = Colors.grey;
 bool isDriverActive = false;
-String statusText = "Now Offline";

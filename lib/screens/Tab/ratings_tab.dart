@@ -19,19 +19,17 @@ class RatingsTabPage extends StatefulWidget {
 }
 
 class _RatingsTabPageState extends State<RatingsTabPage> {
+//! Initlazation Section -- :: --
   double ratingnumbers = 0;
+
+//! InitSate -- :: --
   @override
   void initState() {
     super.initState();
     getRatingNumber();
   }
 
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-  }
-
-  //todo ::
+  //todo ::  Get Rating Number  -- :: --
   getRatingNumber() {
     setState(() {
       ratingnumbers = double.parse(
@@ -40,7 +38,7 @@ class _RatingsTabPageState extends State<RatingsTabPage> {
     setUpRatingTitle();
   }
 
-//todo  ::
+//todo  :: Set Up Rating Title -- :: --
 
   setUpRatingTitle() {
     if (ratingnumbers == 1) {
@@ -70,6 +68,7 @@ class _RatingsTabPageState extends State<RatingsTabPage> {
     }
   }
 
+//! UI section -- :: --
   @override
   Widget build(BuildContext context) {
     return Scaffold(

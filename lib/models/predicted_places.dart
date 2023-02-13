@@ -1,4 +1,6 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
+//! This Model Is for Search Places for Destination -- :: --
+
 class PredictedPlaces {
   String? placeId;
   String? mainText;

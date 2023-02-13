@@ -1,16 +1,22 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first, must_be_immutable
 import 'package:flutter/material.dart';
 
 class InfoDesignUIWidget extends StatefulWidget {
   String? textInfo;
   IconData? iconData;
 
-  InfoDesignUIWidget({this.textInfo, this.iconData});
+  InfoDesignUIWidget({
+    Key? key,
+    this.textInfo,
+    this.iconData,
+  }) : super(key: key);
 
   @override
   State<InfoDesignUIWidget> createState() => _InfoDesignUIWidgetState();
 }
 
 class _InfoDesignUIWidgetState extends State<InfoDesignUIWidget> {
+  //! UI Section    -- :: --
   @override
   Widget build(BuildContext context) {
     return Card(

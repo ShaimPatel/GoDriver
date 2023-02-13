@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 void main() async {
+  //! Initlazation Section -- :: --
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   runApp(
@@ -15,7 +16,7 @@ void main() async {
         create: (context) => AppInfo(),
         child: MaterialApp(
           debugShowCheckedModeBanner: false,
-          title: 'GoDriver',
+          title: 'GoApp',
           theme: ThemeData(
             primarySwatch: Colors.blue,
           ),

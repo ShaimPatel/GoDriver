@@ -28,30 +28,35 @@ class NewTripScreen extends StatefulWidget {
 }
 
 class _NewTripScreenState extends State<NewTripScreen> {
-//! Initilization Section...***
+//! Initilization Section -- :: --
 
   String? buttonTile = "Arrived";
+  String rideRequestStatus = "accepted";
+  String durationFromOriginToDestination = "";
+
   Color? buttonColors = Colors.green;
   Position? onlineDriverCurrentPosition;
+  BitmapDescriptor? iconAnimatedMarker;
+  GoogleMapController? newTripGoogleMapController;
+
   Set<Marker> setOfMarker = <Marker>{};
   Set<Circle> setOfCircle = <Circle>{};
   Set<Polyline> setOfPolyline = <Polyline>{};
   List<LatLng> polyLinePositionCordinates = [];
-  PolylinePoints polylinePoints = PolylinePoints();
-  double mapPadding = 0.0;
-  String rideRequestStatus = "accepted";
-  String durationFromOriginToDestination = "";
-  bool isRequestDirectinDetails = false;
 
-  BitmapDescriptor? iconAnimatedMarker;
+  PolylinePoints polylinePoints = PolylinePoints();
+  final Completer<GoogleMapController> _controller =
+      Completer<GoogleMapController>();
   var geoLocator = Geolocator();
+
+  double mapPadding = 0.0;
+
+  bool isRequestDirectinDetails = false;
 
   static const CameraPosition _kGooglePlex =
       CameraPosition(target: LatLng(26.8467, 80.9462), zoom: 14.4746);
-  final Completer<GoogleMapController> _controller =
-      Completer<GoogleMapController>();
-  GoogleMapController? newTripGoogleMapController;
-//! Funcation /Method Section....*
+
+//! Funcation /Method Section  -- :: --
 
 //todo :  Step :: 1 when driver accept the user ride request
 //todo: originLatLng  = driverCurrent Location
@@ -155,7 +160,7 @@ class _NewTripScreenState extends State<NewTripScreen> {
     });
   }
 
-//todo:  Save Assign Driver Details to user Ride Request..!
+//todo ::   Save Assign Driver Details to user Ride Request -- :: --
 
   saveAssigenDriverDetailsUserRiderRequest() {
     DatabaseReference databaseReference = FirebaseDatabase.instance
@@ -179,7 +184,7 @@ class _NewTripScreenState extends State<NewTripScreen> {
     saveRideRequestIdToDriverHistory();
   }
 
-//todo: Save Ride Request To Driver History..!
+//todo  :: Save Ride Request To Driver History  -- :: --
 
   saveRideRequestIdToDriverHistory() {
     DatabaseReference tripsHistoryRefrence = FirebaseDatabase.instance
@@ -193,7 +198,7 @@ class _NewTripScreenState extends State<NewTripScreen> {
         .set(true);
   }
 
-//todo:->  createActiveDriverIconMarker
+//todo  ::  Create Active Driver IconMarker -- :: --
   createDriverIconMarker() {
     if (iconAnimatedMarker == null) {
       ImageConfiguration imageConfiguration = createLocalImageConfiguration(
@@ -207,7 +212,7 @@ class _NewTripScreenState extends State<NewTripScreen> {
       });
     }
   }
-//todo: ->  Update Drivers Location RealTime..
+//todo  ::   Update Drivers Location RealTime  -- :: --
 
   getDriversLocationsUpdateAtRealTime() {
     LatLng oldLatLng = const LatLng(0, 0);
@@ -238,7 +243,7 @@ class _NewTripScreenState extends State<NewTripScreen> {
       oldLatLng = latLngLiveDriverPosition;
       updateDurationTimeAtRealTime();
 
-//? Updateng Driver Location At Real Time In dataBase..
+//? Updateng Driver Location At Real Time In dataBase   -- :: --
       Map driverLatLngDataMap = {
         "latitude": onlineDriverCurrentPosition!.latitude.toString(),
         "longitude": onlineDriverCurrentPosition!.longitude.toString()
@@ -252,7 +257,7 @@ class _NewTripScreenState extends State<NewTripScreen> {
     });
   }
 
-//todo: Update Duratin Time At Real Time
+//todo  :: Update Duratin Time At Real Time  -- :: --
   updateDurationTimeAtRealTime() async {
     if (isRequestDirectinDetails == false) {
       isRequestDirectinDetails = true;
@@ -283,7 +288,7 @@ class _NewTripScreenState extends State<NewTripScreen> {
     }
   }
 
-//todo:  End Trip Now
+//todo  ::  End Trip Now -- :: --
   endTripNow() async {
     showDialog(
         context: context,
@@ -321,7 +326,7 @@ class _NewTripScreenState extends State<NewTripScreen> {
     streamSubscriptionDriverLivePosition.cancel();
     Navigator.pop(context);
 
-    //? Display Fare Amount in Dialog Box..
+    //? Display Fare Amount in Dialog Box.. -- :: --
     showDialog(
         context: context,
         builder: (BuildContext context) => FareAmountCollectionDialog(
@@ -332,7 +337,7 @@ class _NewTripScreenState extends State<NewTripScreen> {
     saveFareAmountToDriverEarnings(totalFareAmount);
   }
 
-//todo ::  Save Fare Amount To Driver Earning ..
+//todo ::  Save Fare Amount To Driver Earning -- :: --
 
   saveFareAmountToDriverEarnings(double totalFareAmount) {
     FirebaseDatabase.instance
@@ -362,14 +367,14 @@ class _NewTripScreenState extends State<NewTripScreen> {
     });
   }
 
-//! InitSectin ..****
+//! InitSectin    -- :: --
   @override
   void initState() {
     super.initState();
     saveAssigenDriverDetailsUserRiderRequest();
   }
 
-//! UI Section...*****
+//! UI Section  -- :: --
 
   @override
   Widget build(BuildContext context) {
@@ -377,7 +382,7 @@ class _NewTripScreenState extends State<NewTripScreen> {
     return Scaffold(
       body: Stack(
         children: [
-          //? GoogleMap
+          //? GoogleMap -- :: --
 
           GoogleMap(
               padding: EdgeInsets.only(bottom: mapPadding),
@@ -407,7 +412,7 @@ class _NewTripScreenState extends State<NewTripScreen> {
                 getDriversLocationsUpdateAtRealTime();
               }),
 
-          //? UI
+          //? UI -- :: --
 
           Positioned(
             bottom: 0,
@@ -535,7 +540,7 @@ class _NewTripScreenState extends State<NewTripScreen> {
                           )),
                         ),
                         onPressed: () async {
-                          //? driver has arrived at user pickUp location :: Arvied Button
+                          //? driver has arrived at user pickUp location :: Arvied Button -- :: --
                           if (rideRequestStatus == "accepted") {
                             rideRequestStatus = "arrived";
                             FirebaseDatabase.instance
@@ -580,7 +585,7 @@ class _NewTripScreenState extends State<NewTripScreen> {
                             });
                           }
                           //? Driver Reached Destination Point (END TRIP).. ::
-                          //!End Trip
+                          //! End Trip -- :: --
                           else if (rideRequestStatus == "onTrip") {
                             endTripNow();
                           }

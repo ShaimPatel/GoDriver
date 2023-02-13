@@ -18,7 +18,7 @@ import 'dart:developer' as developer;
 import '../models/history_model.dart';
 
 class AssistantMethods {
-  //! Funcation for searchAddressForGeographicCordinates..
+  //todo :: Funcation for search Address For Geographic Cordinates..
 
   static Future<String> searchAddressForGeographicCordinates(
       Position position, context) async {
@@ -39,6 +39,8 @@ class AssistantMethods {
     return humanReadableAddress;
   }
 
+//todo :: Read Current Online Information of drivers...!
+
   static void readCurrentOnLineInfo() async {
     currentFirebaseUser = FirebaseAuth.instance.currentUser;
     DatabaseReference userRef = FirebaseDatabase.instance
@@ -54,7 +56,7 @@ class AssistantMethods {
     });
   }
 
-  //! Start to End Direction details
+//todo  ::  Start to End Direction details ..!
 
   static Future<DirectionDetailsInfo?> obtainedOriginToDestinationDetails(
       LatLng originPosition, LatLng destinationPosition) async {
@@ -160,7 +162,7 @@ class AssistantMethods {
     });
   }
 
-//todo ::
+//todo :: Raed Trips history Information of All Rides
   static void readTripsHistoryInfromation(context) {
     var tripAllKeys =
         Provider.of<AppInfo>(context, listen: false).historyTripKeyList;
@@ -182,7 +184,8 @@ class AssistantMethods {
     }
   }
 
-//todo ::
+//todo :: Read The Driver Total Earnigs..!
+
   static void readDriverEarning(BuildContext context) {
     FirebaseDatabase.instance
         .ref()
@@ -200,7 +203,7 @@ class AssistantMethods {
     readTripKeysForOnlineDrivers(context);
   }
 
-//todo :: Rating For Online Drivers
+//todo ::  Raed the drivers Rating For Online Drivers
 
   static void readDriverRatings(BuildContext context) {
     FirebaseDatabase.instance

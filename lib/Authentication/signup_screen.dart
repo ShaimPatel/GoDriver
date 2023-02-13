@@ -14,13 +14,13 @@ class SignUpScreen extends StatefulWidget {
 }
 
 class _SignUpScreenState extends State<SignUpScreen> {
-  //!
+//! InitLization Section -- :: --
   TextEditingController nameTextEditingController = TextEditingController();
   TextEditingController emailTextEditingController = TextEditingController();
   TextEditingController phoneTextEditingController = TextEditingController();
   TextEditingController passwordTextEditingController = TextEditingController();
 
-  //! validate
+//todo ::  Validation for feailds -- :: --
   validateForm() {
     if (nameTextEditingController.text.length < 3) {
       return Fluttertoast.showToast(
@@ -72,7 +72,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
     }
   }
 
-//! Save Drive Infomation..
+//todo ::  Save Drive Infomation..
   saveDriveInfo() async {
     showDialog(
         context: context,
@@ -116,6 +116,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
       Fluttertoast.showToast(msg: "Account han not been created");
     }
   }
+
+//! UI Section -- :: --
 
   @override
   Widget build(BuildContext context) {

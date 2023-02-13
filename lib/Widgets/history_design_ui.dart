@@ -16,7 +16,9 @@ class HistoryDesignUIWedget extends StatefulWidget {
 }
 
 class _HistoryDesignUIWedgetState extends State<HistoryDesignUIWedget> {
-//todo :: Formate Date time
+//! Funcation/Methods Section -- :: --
+
+//todo :: Formate Date time    -- :: --
   String fromateDateAndTime(String dateTimeFromDB) {
     DateTime dateTime = DateTime.parse(dateTimeFromDB);
     //? Jan 10                               //? 2023                              //? 1:12 pm
@@ -25,6 +27,7 @@ class _HistoryDesignUIWedgetState extends State<HistoryDesignUIWedget> {
     return formatedDateTime;
   }
 
+//! UI Section  -- :: --
   @override
   Widget build(BuildContext context) {
     return Padding(

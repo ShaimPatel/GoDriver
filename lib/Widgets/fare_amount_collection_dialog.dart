@@ -1,3 +1,5 @@
+// ignore_for_file: must_be_immutable
+
 import 'package:driver_app/global/global.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -17,6 +19,7 @@ class FareAmountCollectionDialog extends StatefulWidget {
 
 class _FareAmountCollectionDialogState
     extends State<FareAmountCollectionDialog> {
+//! UI Section -- :: --
   @override
   Widget build(BuildContext context) {
     return Dialog(

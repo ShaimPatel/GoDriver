@@ -24,9 +24,10 @@ class HomeTabPage extends StatefulWidget {
 }
 
 class _HomeTabPageState extends State<HomeTabPage> {
-//! Initilization Section...***
+//! Initilization Section   -- :: --
 
   var geoLocator = Geolocator();
+
   GoogleMapController? newGoogleMapController;
   LocationPermission? _locationPermission;
 
@@ -35,9 +36,9 @@ class _HomeTabPageState extends State<HomeTabPage> {
   static const CameraPosition _kGooglePlex =
       CameraPosition(target: LatLng(26.8467, 80.9462), zoom: 14.4746);
 
-//! Funcation/Method Section....*
+//! Funcation/Method Section    -- :: --
 
-//todo: CheckLoaction Permission
+//todo  :: CheckLoaction Permission -- :: --
   checkLocationPermission() async {
     _locationPermission = await Geolocator.requestPermission();
     if (_locationPermission == LocationPermission.denied) {
@@ -47,7 +48,7 @@ class _HomeTabPageState extends State<HomeTabPage> {
     }
   }
 
-//todo:LocateUserLocation
+//todo  ::  Locate User Location    -- :: --
   locateDriverLocation() async {
     Position cPosition = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high);
@@ -66,7 +67,7 @@ class _HomeTabPageState extends State<HomeTabPage> {
     AssistantMethods.readDriverRatings(context);
   }
 
-//todo:  Read Current Drivers Infomation..
+//todo    ::  Read Current Drivers Infomation.. -- :: --
   readCurrentDriverInfomation() async {
     currentFirebaseUser = firebaseAuth.currentUser;
     await FirebaseDatabase.instance
@@ -103,7 +104,7 @@ class _HomeTabPageState extends State<HomeTabPage> {
     AssistantMethods.readDriverEarning(context);
   }
 
-//todo: ->  For Driver Online or Offline
+//todo  ::   For Driver Online or Offline -- :: --
   driverIsOnlineNow() async {
     Position pos = await Geolocator.getCurrentPosition(
       desiredAccuracy: LocationAccuracy.high,
@@ -125,7 +126,7 @@ class _HomeTabPageState extends State<HomeTabPage> {
     databaseref.onValue.listen((event) {});
   }
 
-//todo: ->  Update Drivers Location RealTime..
+//todo ::  Update Drivers Location RealTime   -- :: --
   updateDriversLocationsRealTime() {
     streamSubscription =
         Geolocator.getPositionStream().listen((Position position) {
@@ -140,7 +141,7 @@ class _HomeTabPageState extends State<HomeTabPage> {
     });
   }
 
-//todo: ->  Driver Offline
+//todo ::   Driver Offline  -- :: --
 
   driverIsOfflineNow() {
     Geofire.removeLocation(currentFirebaseUser!.uid);
@@ -185,7 +186,7 @@ class _HomeTabPageState extends State<HomeTabPage> {
           },
         ),
 
-        //? For Online or Offline..
+        //? For Online or Offline.. -- :: --
         statusText != "Now Online"
             ? Container(
                 height: MediaQuery.of(context).size.height,

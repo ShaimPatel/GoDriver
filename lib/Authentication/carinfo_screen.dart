@@ -14,6 +14,7 @@ class CarInfoScreen extends StatefulWidget {
 }
 
 class _CarInfoScreenState extends State<CarInfoScreen> {
+//! Initization Section -- :: --
   TextEditingController carModelTextEditingController = TextEditingController();
   TextEditingController carNumberTextEditingController =
       TextEditingController();
@@ -22,7 +23,10 @@ class _CarInfoScreenState extends State<CarInfoScreen> {
   List<String> carTypeList = ['uber-x', 'uber-go', 'bike'];
   String? selectedCarType;
 
-  //!
+//! Funcation /Method Section ---- :: ----
+
+//todo :: -- Save Car or Vechile Information --
+
   saveCarInfo() {
     showDialog(
         context: context,
@@ -50,6 +54,8 @@ class _CarInfoScreenState extends State<CarInfoScreen> {
     Navigator.of(context)
         .push(MaterialPageRoute(builder: (context) => const MySplashScreen()));
   }
+
+//! UI Section ...****
 
   @override
   Widget build(BuildContext context) {
