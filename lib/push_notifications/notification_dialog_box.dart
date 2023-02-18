@@ -59,7 +59,7 @@ class _NotificationDialogBoxState extends State<NotificationDialogBox> {
             .set("accepted");
         AssistantMethods.pauseLiveLocationUpdates();
         //? send  driver to newRideScreen.. TripScreen
-        Navigator.push(
+        Navigator.pushReplacement(
           context,
           MaterialPageRoute(
               builder: ((context) => NewTripScreen(

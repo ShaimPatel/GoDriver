@@ -282,7 +282,7 @@ class _NewTripScreenState extends State<NewTripScreen> {
       if (directionInfomation != null) {
         setState(() {
           durationFromOriginToDestination =
-              directionInfomation.durationText!.toString();
+              directionInfomation.durationText.toString();
         });
       }
       isRequestDirectinDetails = false;
@@ -439,7 +439,7 @@ class _NewTripScreenState extends State<NewTripScreen> {
                   children: [
                     //? Duration
                     Text(
-                      durationFromOriginToDestination.toString(),
+                      durationFromOriginToDestination,
                       style: TextStyle(
                         fontSize: 16.0,
                         fontWeight: FontWeight.bold,
@@ -535,9 +535,9 @@ class _NewTripScreenState extends State<NewTripScreen> {
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.transparent,
                           textStyle: const TextStyle(fontSize: 16),
-                          shape: const StadiumBorder(
+                          shape: StadiumBorder(
                               side: BorderSide(
-                            color: Colors.white,
+                            color: buttonColors!,
                           )),
                         ),
                         onPressed: () async {
