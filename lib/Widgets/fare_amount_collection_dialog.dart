@@ -1,8 +1,8 @@
 // ignore_for_file: must_be_immutable
 
 import 'package:driver_app/global/global.dart';
+import 'package:driver_app/screens/splash/splash_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 class FareAmountCollectionDialog extends StatefulWidget {
   double? totalFareAmount;
@@ -80,7 +80,9 @@ class _FareAmountCollectionDialogState
                   child: ElevatedButton(
                       onPressed: () {
                         Future.delayed(const Duration(seconds: 2), () {
-                          SystemNavigator.pop();
+                          Navigator.of(context).pushReplacement(
+                              MaterialPageRoute(
+                                  builder: (ctx) => const MySplashScreen()));
                         });
                       },
                       style: ElevatedButton.styleFrom(

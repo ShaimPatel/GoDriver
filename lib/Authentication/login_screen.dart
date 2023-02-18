@@ -1,3 +1,5 @@
+import 'package:driver_app/Authentication/components/my_button.dart';
+import 'package:driver_app/Authentication/components/my_textfield.dart';
 import 'package:driver_app/Authentication/signup_screen.dart';
 import 'package:driver_app/global/global.dart';
 import 'package:driver_app/screens/splash/splash_screen.dart';
@@ -5,7 +7,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:video_player/video_player.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:hexcolor/hexcolor.dart';
 
 import '../Widgets/progess_dialog.dart';
 
@@ -21,29 +24,48 @@ class _LoginScreenState extends State<LoginScreen> {
 
   TextEditingController emailTextEditingController = TextEditingController();
   TextEditingController passwordTextEditingController = TextEditingController();
-  late VideoPlayerController _controller;
 
 //! Funcation/ Method Section -- :: ---
 
 //todo :: Validation for Feaild ..!
   validateForm() {
     if (!emailTextEditingController.text.contains("@")) {
+      showDialog(
+          context: context,
+          barrierDismissible: false,
+          barrierColor: Colors.transparent,
+          builder: (BuildContext ctx) {
+            return const ProgressDialogWidget();
+          });
+      Future.delayed(const Duration(seconds: 3), () {
+        Navigator.pop(context);
+      });
       return Fluttertoast.showToast(
-        msg: 'Email is not valid..!',
-        backgroundColor: Colors.white,
+        msg: 'Email is not valid // Empty',
+        backgroundColor: Colors.black,
         fontSize: 12,
-        textColor: Colors.red,
+        textColor: Colors.white,
         toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.TOP,
+        gravity: ToastGravity.BOTTOM,
       );
     } else if (passwordTextEditingController.text.length < 6) {
+      showDialog(
+          context: context,
+          barrierDismissible: false,
+          barrierColor: Colors.transparent,
+          builder: (BuildContext ctx) {
+            return const ProgressDialogWidget();
+          });
+      Future.delayed(const Duration(seconds: 3), () {
+        Navigator.pop(context);
+      });
       return Fluttertoast.showToast(
         msg: 'Password must be atleast 6 charactiers..!',
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.black,
         fontSize: 12,
-        textColor: Colors.red,
+        textColor: Colors.white,
         toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.TOP,
+        gravity: ToastGravity.BOTTOM,
       );
     } else {
       loginDriverNow();
@@ -55,9 +77,9 @@ class _LoginScreenState extends State<LoginScreen> {
     showDialog(
         context: context,
         barrierDismissible: false,
+        barrierColor: Colors.transparent,
         builder: (BuildContext ctx) {
-          return const ProgressDialogWidget(
-              message: "Processing , Please wait ..");
+          return const ProgressDialogWidget();
         });
     final User? firebaseUser = (await firebaseAuth
             .signInWithEmailAndPassword(
@@ -80,18 +102,20 @@ class _LoginScreenState extends State<LoginScreen> {
           if (!mounted) return;
           Fluttertoast.showToast(msg: "Login Successful.");
 
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (BuildContext ctx) => const MySplashScreen()));
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(
+              builder: (BuildContext ctx) => const MySplashScreen(),
+            ),
+          );
         } else {
           Fluttertoast.showToast(msg: "No Record exist with this mail.");
 
           firebaseAuth.signOut();
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (BuildContext ctx) => const MySplashScreen()));
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(
+              builder: (BuildContext ctx) => const MySplashScreen(),
+            ),
+          );
         }
       });
     } else {
@@ -101,7 +125,7 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-//! InitState -- :: --
+  //! InitState -- :: --
   @override
   void initState() {
     super.initState();
@@ -112,95 +136,167 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   void dispose() {
     super.dispose();
-    _controller.dispose();
+    emailTextEditingController.dispose();
+    passwordTextEditingController.dispose();
   }
 
 //! UI Section -- :: --
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white.withOpacity(1),
-      body: Stack(
-        children: [
-          SingleChildScrollView(
-            child: Container(
-              color: Colors.white.withOpacity(0.2),
-              height: MediaQuery.of(context).size.height,
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
+    return SafeArea(
+      child: Scaffold(
+        resizeToAvoidBottomInset: false,
+        backgroundColor: HexColor("#fed8c3"),
+        body: ListView(
+          padding: const EdgeInsets.fromLTRB(0, 400, 0, 0),
+          shrinkWrap: true,
+          scrollDirection: Axis.vertical,
+          reverse: true,
+          children: [
+            Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Stack(
                   children: [
-                    const SizedBox(height: 10),
-                    Padding(
-                        padding: const EdgeInsets.all(20),
-                        child: Image.asset("assets/images/logo1.png")),
-                    const SizedBox(height: 10),
-                    const Text("Login as a Driver",
-                        style: TextStyle(
-                            fontSize: 26,
-                            color: Colors.grey,
-                            fontWeight: FontWeight.bold)),
-                    TextField(
-                      controller: emailTextEditingController,
-                      style: const TextStyle(color: Colors.grey),
-                      keyboardType: TextInputType.emailAddress,
-                      decoration: const InputDecoration(
-                        labelText: "E-mail",
-                        hintText: "Enter E-mail..!",
-                        enabledBorder: UnderlineInputBorder(
-                            borderSide: BorderSide(color: Colors.grey)),
-                        focusedBorder: UnderlineInputBorder(
-                            borderSide: BorderSide(color: Colors.grey)),
-                        hintStyle: TextStyle(color: Colors.grey, fontSize: 10),
-                        labelStyle: TextStyle(color: Colors.grey, fontSize: 14),
-                      ),
-                    ),
-                    TextField(
-                      controller: passwordTextEditingController,
-                      style: const TextStyle(color: Colors.grey),
-                      keyboardType: TextInputType.text,
-                      obscureText: true,
-                      decoration: const InputDecoration(
-                        labelText: "Password",
-                        hintText: "Enter Password..!",
-                        enabledBorder: UnderlineInputBorder(
-                            borderSide: BorderSide(color: Colors.grey)),
-                        focusedBorder: UnderlineInputBorder(
-                            borderSide: BorderSide(color: Colors.grey)),
-                        hintStyle: TextStyle(color: Colors.grey, fontSize: 10),
-                        labelStyle: TextStyle(color: Colors.grey, fontSize: 14),
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    ElevatedButton(
-                        onPressed: () {
-                          validateForm();
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.lightGreenAccent,
+                    Container(
+                      // height: 535,
+                      height: MediaQuery.of(context).size.height * 0.70,
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: HexColor("#ffffff"),
+                        borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(40),
+                          topRight: Radius.circular(40),
                         ),
-                        child: Text("Login".toUpperCase(),
-                            style: const TextStyle(
-                                color: Colors.black54, fontSize: 18))),
-                    const SizedBox(height: 10),
-                    TextButton(
-                        onPressed: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => const SignUpScreen()));
-                        },
-                        child: const Text(
-                          "Don't have any Account? Create Here..!",
-                          style: TextStyle(color: Colors.grey),
-                        ))
+                      ),
+                      child: SingleChildScrollView(
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(30, 20, 30, 20),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Log In",
+                                style: GoogleFonts.poppins(
+                                  fontSize: 40,
+                                  fontWeight: FontWeight.bold,
+                                  color: HexColor("#4f4f4f"),
+                                ),
+                              ),
+                              const SizedBox(height: 20),
+                              Padding(
+                                padding:
+                                    const EdgeInsets.fromLTRB(15, 0, 0, 20),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      "Email",
+                                      style: GoogleFonts.poppins(
+                                        fontSize: 18,
+                                        color: HexColor("#8d8d8d"),
+                                      ),
+                                    ),
+                                    const SizedBox(
+                                      height: 10,
+                                    ),
+                                    MyTextField(
+                                      onChanged: (() {}),
+                                      controller: emailTextEditingController,
+                                      hintText: "hello@gmail.com",
+                                      obscureText: false,
+                                      prefixIcon:
+                                          const Icon(Icons.mail_outline),
+                                    ),
+                                    const SizedBox(
+                                      height: 10,
+                                    ),
+                                    Text(
+                                      "Password",
+                                      style: GoogleFonts.poppins(
+                                        fontSize: 18,
+                                        color: HexColor("#8d8d8d"),
+                                      ),
+                                    ),
+                                    const SizedBox(
+                                      height: 10,
+                                    ),
+                                    MyTextField(
+                                      controller: passwordTextEditingController,
+                                      hintText: "**************",
+                                      obscureText: true,
+                                      prefixIcon:
+                                          const Icon(Icons.lock_outline),
+                                    ),
+                                    const SizedBox(
+                                      height: 10,
+                                    ),
+                                    MyButton(
+                                      onPressed: () {
+                                        validateForm();
+                                      },
+                                      buttonText: 'Login',
+                                    ),
+                                    const SizedBox(
+                                      height: 12,
+                                    ),
+                                    Row(
+                                      children: [
+                                        Text("Don't have an account?",
+                                            style: GoogleFonts.poppins(
+                                              fontSize: 15,
+                                              color: HexColor("#8d8d8d"),
+                                            )),
+                                        TextButton(
+                                          child: Text(
+                                            "Sign Up",
+                                            style: GoogleFonts.poppins(
+                                              fontSize: 15,
+                                              color: HexColor("#44564a"),
+                                            ),
+                                          ),
+                                          // onPressed: () => Navigator.push(
+                                          //   context,
+                                          //   MaterialPageRoute(
+                                          //     builder: (context) =>
+                                          //         const SignUpScreen(),
+                                          //   ),
+                                          // ),
+                                          onPressed: () {
+                                            Navigator.of(context)
+                                                .pushReplacement(
+                                              MaterialPageRoute(
+                                                builder: (BuildContext ctx) =>
+                                                    const SignUpScreen(),
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    Transform.translate(
+                      offset: const Offset(0, -200),
+                      child: Image.asset(
+                        'assets/images/logo1.png',
+                        scale: 1.5,
+                        width: double.infinity,
+                      ),
+                    ),
                   ],
-                ),
-              ),
+                )
+              ],
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

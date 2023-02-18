@@ -26,6 +26,7 @@ class _RatingsTabPageState extends State<RatingsTabPage> {
   @override
   void initState() {
     super.initState();
+
     getRatingNumber();
   }
 

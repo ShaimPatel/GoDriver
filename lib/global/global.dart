@@ -27,3 +27,5 @@ String? driverVehicleType = "";
 
 Color buttonsColor = Colors.grey;
 bool isDriverActive = false;
+
+bool isLoading = false;

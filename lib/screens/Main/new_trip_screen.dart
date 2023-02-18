@@ -1,4 +1,4 @@
-// ignore_for_file: must_be_immutable, use_build_context_synchronously
+// ignore_for_file: must_be_immutable, use_build_context_synchronously, unused_local_variable
 
 import 'dart:async';
 
@@ -69,8 +69,7 @@ class _NewTripScreenState extends State<NewTripScreen> {
       LatLng originLatLng, LatLng destinationLatLng) async {
     showDialog(
         context: context,
-        builder: (BuildContext ctx) =>
-            const ProgressDialogWidget(message: "Please Wait"));
+        builder: (BuildContext ctx) => const ProgressDialogWidget());
 
     var directionDetailsInfo =
         await AssistantMethods.obtainedOriginToDestinationDetails(
@@ -79,6 +78,7 @@ class _NewTripScreenState extends State<NewTripScreen> {
     List<PointLatLng> decodedPpointsResultList =
         polylinePoints.decodePolyline(directionDetailsInfo!.encodedPoint!);
     polyLinePositionCordinates.clear();
+    Navigator.pop(context);
     if (decodedPpointsResultList.isNotEmpty) {
       for (var pointLatLng in decodedPpointsResultList) {
         polyLinePositionCordinates
@@ -281,7 +281,8 @@ class _NewTripScreenState extends State<NewTripScreen> {
               originLatLng, destinationLatLng!);
       if (directionInfomation != null) {
         setState(() {
-          durationFromOriginToDestination = directionInfomation.durationText!;
+          durationFromOriginToDestination =
+              directionInfomation.durationText!.toString();
         });
       }
       isRequestDirectinDetails = false;
@@ -292,8 +293,7 @@ class _NewTripScreenState extends State<NewTripScreen> {
   endTripNow() async {
     showDialog(
         context: context,
-        builder: (BuildContext context) =>
-            const ProgressDialogWidget(message: "Please wait..!"));
+        builder: (BuildContext context) => const ProgressDialogWidget());
     //? Get Trip Direction Details :: distance travlled
     var currentDriverPositionLatLng = LatLng(
         onlineDriverCurrentPosition!.latitude,
@@ -352,6 +352,7 @@ class _NewTripScreenState extends State<NewTripScreen> {
         double driverToatlEarning = oldEarning + totalFareAmount;
         FirebaseDatabase.instance
             .ref()
+            .child("drivers")
             .child(currentFirebaseUser!.uid)
             .child("eraning")
             .set(driverToatlEarning.toString());
@@ -438,7 +439,7 @@ class _NewTripScreenState extends State<NewTripScreen> {
                   children: [
                     //? Duration
                     Text(
-                      durationFromOriginToDestination,
+                      durationFromOriginToDestination.toString(),
                       style: TextStyle(
                         fontSize: 16.0,
                         fontWeight: FontWeight.bold,
@@ -560,8 +561,7 @@ class _NewTripScreenState extends State<NewTripScreen> {
                                 context: context,
                                 barrierDismissible: true,
                                 builder: (BuildContext context) =>
-                                    const ProgressDialogWidget(
-                                        message: "Loading..!"));
+                                    const ProgressDialogWidget());
 
                             await drawPolyLineFromOriginToDestination(
                                 widget.userRideRequestDetails!.originLatLng!,

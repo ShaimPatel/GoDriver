@@ -26,7 +26,9 @@ class PushNotificationSystem {
       if (remoteMessage != null) {
         //display ride request information - user information for a ride..
         developer.log("This is Ride Request ID :: ");
-        print(remoteMessage.data["rideRequestId"]);
+        // if (kDebugMode) {
+        //   print(remoteMessage.data["rideRequestId"]);
+        // }
         readUserRideRequestInformation(
             remoteMessage.data["rideRequestId"], context);
       }

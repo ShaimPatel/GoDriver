@@ -3,7 +3,11 @@ import 'package:driver_app/screens/Tab/home_tab.dart';
 import 'package:driver_app/screens/Tab/profile_tab.dart';
 import 'package:driver_app/screens/Tab/ratings_tab.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_offline/flutter_offline.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
+
+import '../../Widgets/progess_dialog.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -38,15 +42,51 @@ class _MainScreenState extends State<MainScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: TabBarView(
-        physics: const NeverScrollableScrollPhysics(),
-        controller: tabController,
-        children: [
-          const HomeTabPage(),
-          const EarningsTabPage(),
-          RatingsTabPage(),
-          const ProfileTabPage()
-        ],
+      body: OfflineBuilder(
+        debounceDuration: Duration.zero,
+        connectivityBuilder: (
+          BuildContext ctx,
+          ConnectivityResult connectivity,
+          Widget child,
+        ) {
+          if (connectivity == ConnectivityResult.none) {
+            return Scaffold(
+              backgroundColor: Colors.green[100],
+              body: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  const ProgressDialogWidget(),
+                  const SizedBox(height: 20),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 25),
+                    child: Center(
+                      child: Text(
+                        'Please check your internet connection!',
+                        style: GoogleFonts.poppins(
+                          color: Colors.black,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }
+          return child;
+        },
+        child: TabBarView(
+          physics: const NeverScrollableScrollPhysics(),
+          controller: tabController,
+          children: [
+            const HomeTabPage(),
+            const EarningsTabPage(),
+            RatingsTabPage(),
+            const ProfileTabPage()
+          ],
+        ),
       ),
       bottomNavigationBar: SalomonBottomBar(
         currentIndex: selectedIndex,

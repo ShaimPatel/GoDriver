@@ -1,39 +1,28 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class ProgressDialogWidget extends StatelessWidget {
-  final String? message;
-
   const ProgressDialogWidget({
     Key? key,
-    required this.message,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     //! UI Section -- :: --
-    return Dialog(
-      backgroundColor: Colors.black54,
+    return Center(
       child: Container(
-        margin: const EdgeInsets.all(16.0),
+        height: 100,
+        width: 100,
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(6),
+          color: Colors.black54,
+          borderRadius: BorderRadius.circular(10),
+          // shape: BoxShape.circle,
         ),
-        child: Padding(
-          padding: const EdgeInsets.all(6.0),
-          child: Row(
-            children: [
-              const SizedBox(width: 6.0),
-              const CircularProgressIndicator(
-                  valueColor: AlwaysStoppedAnimation<Color>(Colors.green)),
-              const SizedBox(width: 26.0),
-              Text(
-                message!,
-                style: const TextStyle(color: Colors.grey, fontSize: 12.0),
-              )
-            ],
-          ),
+        child: const CupertinoActivityIndicator(
+          color: Colors.white,
+          radius: 30,
+          animating: true,
         ),
       ),
     );

@@ -14,6 +14,18 @@ class EarningsTabPage extends StatefulWidget {
 }
 
 class _EarningsTabPageState extends State<EarningsTabPage> {
+  late String driverTotalEarning;
+
+  @override
+  void initState() {
+    super.initState();
+
+    setState(() {
+      driverTotalEarning =
+          Provider.of<AppInfo>(context, listen: false).driverTotalEarnins;
+    });
+  }
+
 //! UI Section -- :: --
   @override
   Widget build(BuildContext context) {
@@ -41,7 +53,7 @@ class _EarningsTabPageState extends State<EarningsTabPage> {
                     height: 10,
                   ),
                   Text(
-                    "₹ ${Provider.of<AppInfo>(context, listen: false).driverTotalEarnins}",
+                    "₹ $driverTotalEarning",
                     style: const TextStyle(
                       color: Colors.grey,
                       fontSize: 60,
@@ -87,18 +99,16 @@ class _EarningsTabPageState extends State<EarningsTabPage> {
                       ),
                     ),
                     Expanded(
-                      child: Container(
-                        child: Text(
-                          Provider.of<AppInfo>(context, listen: false)
-                              .allTripsHistoryInformationList
-                              .length
-                              .toString(),
-                          textAlign: TextAlign.end,
-                          style: const TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,
-                          ),
+                      child: Text(
+                        Provider.of<AppInfo>(context, listen: false)
+                            .allTripsHistoryInformationList
+                            .length
+                            .toString(),
+                        textAlign: TextAlign.end,
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
                         ),
                       ),
                     ),

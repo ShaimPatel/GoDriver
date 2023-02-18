@@ -1,10 +1,16 @@
 import 'package:driver_app/Authentication/carinfo_screen.dart';
+import 'package:driver_app/Authentication/login_screen.dart';
 import 'package:driver_app/Widgets/progess_dialog.dart';
 import 'package:driver_app/global/global.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:hexcolor/hexcolor.dart';
+
+import 'components/my_button.dart';
+import 'components/my_textfield.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -23,53 +29,76 @@ class _SignUpScreenState extends State<SignUpScreen> {
 //todo ::  Validation for feailds -- :: --
   validateForm() {
     if (nameTextEditingController.text.length < 3) {
+      progressBarIndicator();
+
       return Fluttertoast.showToast(
         msg: 'Name must be atleast 3 Characters',
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.black,
         fontSize: 12,
-        textColor: Colors.red,
+        textColor: Colors.white,
         toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.TOP,
+        gravity: ToastGravity.BOTTOM,
       );
     } else if (!emailTextEditingController.text.contains("@")) {
+      progressBarIndicator();
+
       return Fluttertoast.showToast(
         msg: 'Email is not valid..!',
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.black,
         fontSize: 12,
-        textColor: Colors.red,
+        textColor: Colors.white,
         toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.TOP,
+        gravity: ToastGravity.BOTTOM,
       );
     } else if (phoneTextEditingController.text.isEmpty) {
+      progressBarIndicator();
+
       return Fluttertoast.showToast(
-        msg: 'Phone number is required..!',
-        backgroundColor: Colors.white,
+        msg: 'Phone number is requiwhite..!',
+        backgroundColor: Colors.black,
         fontSize: 12,
-        textColor: Colors.red,
+        textColor: Colors.white,
         toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.TOP,
+        gravity: ToastGravity.BOTTOM,
       );
-    } else if (phoneTextEditingController.text.length < 12) {
+    } else if (phoneTextEditingController.text.length > 10) {
+      progressBarIndicator();
+
       return Fluttertoast.showToast(
         msg: 'Phone number is not correct..!',
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.black,
         fontSize: 12,
-        textColor: Colors.red,
+        textColor: Colors.white,
         toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.TOP,
+        gravity: ToastGravity.BOTTOM,
       );
     } else if (passwordTextEditingController.text.length < 6) {
+      progressBarIndicator();
       return Fluttertoast.showToast(
         msg: 'Password must be atleast 6 charactiers..!',
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.black,
         fontSize: 12,
-        textColor: Colors.red,
+        textColor: Colors.white,
         toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.TOP,
+        gravity: ToastGravity.BOTTOM,
       );
     } else {
       saveDriveInfo();
     }
+  }
+
+  //! Widget For Progress Bar
+  Future<void> progressBarIndicator() async {
+    showDialog(
+        context: context,
+        barrierDismissible: false,
+        barrierColor: Colors.transparent,
+        builder: (BuildContext ctx) {
+          return const ProgressDialogWidget();
+        });
+    Future.delayed(const Duration(seconds: 3), () {
+      Navigator.pop(context);
+    });
   }
 
 //todo ::  Save Drive Infomation..
@@ -77,9 +106,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
     showDialog(
         context: context,
         barrierDismissible: false,
+        barrierColor: Colors.transparent,
         builder: (BuildContext ctx) {
-          return const ProgressDialogWidget(
-              message: "Processing , Please wait ..");
+          return const ProgressDialogWidget();
         });
     final User? firebaseUser = (await firebaseAuth
             .createUserWithEmailAndPassword(
@@ -117,117 +146,214 @@ class _SignUpScreenState extends State<SignUpScreen> {
     }
   }
 
+  @override
+  void dispose() {
+    super.dispose();
+    emailTextEditingController.dispose();
+    passwordTextEditingController.dispose();
+    nameTextEditingController.dispose();
+    phoneTextEditingController.dispose();
+  }
+
 //! UI Section -- :: --
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.black,
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            children: [
-              const SizedBox(height: 10),
-              Padding(
-                  padding: const EdgeInsets.all(20),
-                  child: Image.asset("assets/images/logo1.png")),
-              const SizedBox(height: 10),
-              const Text("Register as Driver",
-                  style: TextStyle(
-                      fontSize: 26,
-                      color: Colors.grey,
-                      fontWeight: FontWeight.bold)),
-              TextField(
-                controller: nameTextEditingController,
-                style: const TextStyle(color: Colors.grey),
-                keyboardType: TextInputType.text,
-                decoration: const InputDecoration(
-                  labelText: "Name",
-                  hintText: "Enter Name..!",
-                  enabledBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(color: Colors.grey)),
-                  focusedBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(color: Colors.grey)),
-                  hintStyle: TextStyle(color: Colors.grey, fontSize: 10),
-                  labelStyle: TextStyle(color: Colors.grey, fontSize: 14),
-                ),
-              ),
-              TextField(
-                controller: emailTextEditingController,
-                style: const TextStyle(color: Colors.grey),
-                keyboardType: TextInputType.emailAddress,
-                decoration: const InputDecoration(
-                  labelText: "E-mail",
-                  hintText: "Enter E-mail..!",
-                  enabledBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(color: Colors.grey)),
-                  focusedBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(color: Colors.grey)),
-                  hintStyle: TextStyle(color: Colors.grey, fontSize: 10),
-                  labelStyle: TextStyle(color: Colors.grey, fontSize: 14),
-                ),
-              ),
-              TextField(
-                controller: phoneTextEditingController,
-                style: const TextStyle(color: Colors.grey),
-                keyboardType: TextInputType.number,
-                decoration: const InputDecoration(
-                  labelText: "Phone",
-                  hintText: "Enter Phone ..!",
-                  enabledBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(color: Colors.grey)),
-                  focusedBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(color: Colors.grey)),
-                  hintStyle: TextStyle(color: Colors.grey, fontSize: 10),
-                  labelStyle: TextStyle(color: Colors.grey, fontSize: 14),
-                ),
-              ),
-              TextField(
-                controller: passwordTextEditingController,
-                style: const TextStyle(color: Colors.grey),
-                keyboardType: TextInputType.text,
-                obscureText: true,
-                decoration: const InputDecoration(
-                  labelText: "Password",
-                  hintText: "Enter Password..!",
-                  enabledBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(color: Colors.grey)),
-                  focusedBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(color: Colors.grey)),
-                  hintStyle: TextStyle(color: Colors.grey, fontSize: 10),
-                  labelStyle: TextStyle(color: Colors.grey, fontSize: 14),
-                ),
-              ),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                  onPressed: () {
-                    validateForm();
-
-                    // Navigator.push(
-                    //     context,
-                    //     MaterialPageRoute(
-                    //         builder: (context) => const CarInfoScreen()));
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.lightGreenAccent,
-                  ),
-                  child: const Text("Create Account",
-                      style: TextStyle(color: Colors.black54, fontSize: 18))),
-              const SizedBox(height: 10),
-              TextButton(
-                  onPressed: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const SignUpScreen()));
-                  },
-                  child: const Text(
-                    "Already have an Account? Login Here..!",
-                    style: TextStyle(color: Colors.grey),
-                  ))
-            ],
-          ),
+    return SafeArea(
+      child: Scaffold(
+        resizeToAvoidBottomInset: false,
+        backgroundColor: HexColor("#fed8c3"),
+        body: ListView(
+          padding: const EdgeInsets.fromLTRB(0, 400, 0, 0),
+          shrinkWrap: true,
+          scrollDirection: Axis.vertical,
+          reverse: true,
+          children: [
+            Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Stack(
+                  children: [
+                    Container(
+                      // height: 535,
+                      height: MediaQuery.of(context).size.height * 0.70,
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: HexColor("#ffffff"),
+                        borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(40),
+                          topRight: Radius.circular(40),
+                        ),
+                      ),
+                      child: SingleChildScrollView(
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(30, 20, 30, 20),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Sign Up",
+                                style: GoogleFonts.poppins(
+                                  fontSize: 40,
+                                  fontWeight: FontWeight.bold,
+                                  color: HexColor("#4f4f4f"),
+                                ),
+                              ),
+                              const SizedBox(height: 20),
+                              Padding(
+                                padding:
+                                    const EdgeInsets.fromLTRB(15, 0, 0, 20),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      "Name",
+                                      style: GoogleFonts.poppins(
+                                        fontSize: 18,
+                                        color: HexColor("#8d8d8d"),
+                                      ),
+                                    ),
+                                    const SizedBox(
+                                      height: 10,
+                                    ),
+                                    MyTextField(
+                                      onChanged: (() {}),
+                                      controller: nameTextEditingController,
+                                      hintText: "Enter your name ",
+                                      obscureText: false,
+                                      prefixIcon: const Icon(Icons.person),
+                                    ),
+                                    const SizedBox(
+                                      height: 10,
+                                    ),
+                                    Text(
+                                      "Phone",
+                                      style: GoogleFonts.poppins(
+                                        fontSize: 18,
+                                        color: HexColor("#8d8d8d"),
+                                      ),
+                                    ),
+                                    const SizedBox(
+                                      height: 10,
+                                    ),
+                                    MyTextField(
+                                      onChanged: (() {}),
+                                      controller: phoneTextEditingController,
+                                      hintText: "Phone Number ",
+                                      obscureText: false,
+                                      prefixIcon: const Icon(Icons.phone),
+                                    ),
+                                    const SizedBox(
+                                      height: 10,
+                                    ),
+                                    Text(
+                                      "Email",
+                                      style: GoogleFonts.poppins(
+                                        fontSize: 18,
+                                        color: HexColor("#8d8d8d"),
+                                      ),
+                                    ),
+                                    const SizedBox(
+                                      height: 10,
+                                    ),
+                                    MyTextField(
+                                      onChanged: (() {}),
+                                      controller: emailTextEditingController,
+                                      hintText: "hello@gmail.com",
+                                      obscureText: false,
+                                      prefixIcon:
+                                          const Icon(Icons.mail_outline),
+                                    ),
+                                    const SizedBox(
+                                      height: 10,
+                                    ),
+                                    const SizedBox(
+                                      height: 10,
+                                    ),
+                                    Text(
+                                      "Password",
+                                      style: GoogleFonts.poppins(
+                                        fontSize: 18,
+                                        color: HexColor("#8d8d8d"),
+                                      ),
+                                    ),
+                                    const SizedBox(
+                                      height: 10,
+                                    ),
+                                    MyTextField(
+                                      controller: passwordTextEditingController,
+                                      hintText: "**************",
+                                      obscureText: true,
+                                      prefixIcon:
+                                          const Icon(Icons.lock_outline),
+                                    ),
+                                    const SizedBox(
+                                      height: 10,
+                                    ),
+                                    MyButton(
+                                      onPressed: () {
+                                        validateForm();
+                                      },
+                                      buttonText: 'Proceed',
+                                    ),
+                                    const SizedBox(
+                                      height: 12,
+                                    ),
+                                    Row(
+                                      children: [
+                                        Text("Don't have an account?",
+                                            style: GoogleFonts.poppins(
+                                              fontSize: 15,
+                                              color: HexColor("#8d8d8d"),
+                                            )),
+                                        TextButton(
+                                          child: Text(
+                                            "Sign In",
+                                            style: GoogleFonts.poppins(
+                                              fontSize: 15,
+                                              color: HexColor("#44564a"),
+                                            ),
+                                          ),
+                                          // onPressed: () => Navigator.push(
+                                          //   context,
+                                          //   MaterialPageRoute(
+                                          //     builder: (context) =>
+                                          //         const SignUpScreen(),
+                                          //   ),
+                                          // ),
+                                          onPressed: () {
+                                            Navigator.of(context)
+                                                .pushReplacement(
+                                              MaterialPageRoute(
+                                                builder: (BuildContext ctx) =>
+                                                    const LoginScreen(),
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    Transform.translate(
+                      offset: const Offset(0, -200),
+                      child: Image.asset(
+                        'assets/images/logo1.png',
+                        scale: 1.5,
+                        width: double.infinity,
+                      ),
+                    ),
+                  ],
+                )
+              ],
+            ),
+          ],
         ),
       ),
     );
