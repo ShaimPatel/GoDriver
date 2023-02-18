@@ -66,7 +66,7 @@ class _ProfileTabPageState extends State<ProfileTabPage> {
                   height: 150,
                   width: 150,
                   decoration: BoxDecoration(
-                    color: Colors.blue[100],
+                    color: Colors.green[100],
                     borderRadius: BorderRadius.circular(
                       100,
                     ),

@@ -19,16 +19,13 @@ class _EarningsTabPageState extends State<EarningsTabPage> {
   @override
   void initState() {
     super.initState();
-
-    setState(() {
-      driverTotalEarning =
-          Provider.of<AppInfo>(context, listen: false).driverTotalEarnins;
-    });
   }
 
 //! UI Section -- :: --
   @override
   Widget build(BuildContext context) {
+    driverTotalEarning =
+        Provider.of<AppInfo>(context, listen: false).driverTotalEarnins;
     return Container(
       color: Colors.green[100],
       child: Column(

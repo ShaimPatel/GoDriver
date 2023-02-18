@@ -50,7 +50,7 @@ class AppInfo extends ChangeNotifier {
   //todo  :: Update Drivers Total Earnind -- :: --
   updateDriverTotalEarnings(String totalEarnig) {
     driverTotalEarnins = totalEarnig;
-    notifyListeners();
+    // notifyListeners();
   }
 
   //todo :: Update Driver Avarge Rating -- :: --
