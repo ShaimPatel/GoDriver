@@ -22,7 +22,9 @@ class MyTextField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TextField(
+      scrollPadding: const EdgeInsets.only(bottom: 40),
       controller: controller,
+      textInputAction: TextInputAction.next,
       obscureText: obscureText,
       cursorColor: HexColor("#4f4f4f"),
       decoration: InputDecoration(
