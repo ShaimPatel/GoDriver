@@ -40,7 +40,7 @@ class MainScreenState extends State<MainScreen> {
   double? bottompaddingOfMap = 0.0;
 
   var geoLocator = Geolocator();
-  double searchLocationContainerHeight = 220;
+  double searchLocationContainerHeight = 230;
   double waitingResponseFromDriverContainerHeight = 0;
   double assignedDriverIntoContainerHeight = 0;
   String driverRideStatus = "Driver is comming";
@@ -81,6 +81,20 @@ class MainScreenState extends State<MainScreen> {
   }
 
 //! Funcation/Method Section....*
+
+  //! Widget For Progress Bar
+  Future<void> progressBarIndicator() async {
+    showDialog(
+        context: context,
+        barrierDismissible: false,
+        barrierColor: Colors.transparent,
+        builder: (BuildContext ctx) {
+          return const ProgressDialogWidget();
+        });
+    Future.delayed(const Duration(seconds: 3), () {
+      Navigator.pop(context);
+    });
+  }
 
 //todo-> .. Here are Display Active drive on User Map Icon..
   displayActiveDriversOnUserApp() {
@@ -170,6 +184,7 @@ class MainScreenState extends State<MainScreen> {
 
 //todo :-> LocateUserLocation
   locateUserLocation() async {
+    progressBarIndicator();
     Position cPosition = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high);
     userCurrantPosition = cPosition;
@@ -361,6 +376,7 @@ class MainScreenState extends State<MainScreen> {
 
 //todo: -> _getAddressFromLatLng
   Future<void> _getAddressFromLatLng(Position position) async {
+    progressBarIndicator();
     await placemarkFromCoordinates(
             userCurrantPosition!.latitude, userCurrantPosition!.longitude)
         .then((List<Placemark> placemarks) {
@@ -386,8 +402,7 @@ class MainScreenState extends State<MainScreen> {
 
     showDialog(
         context: context,
-        builder: (BuildContext ctx) =>
-            const ProgressDialogWidget(message: "Please Wait"));
+        builder: (BuildContext ctx) => const ProgressDialogWidget());
 
     var directionDetailsInfo =
         await AssistantMethods.obtainedOriginToDestinationDetails(
@@ -879,7 +894,8 @@ class MainScreenState extends State<MainScreen> {
                         markerSet.clear();
                         openNavigationDrawer = true;
                       });
-                      // SystemNavigator.pop();
+                      SystemNavigator.pop();
+                      Fluttertoast.showToast(msg: "Restarting App :: ");
                     }
                   },
                   child: CircleAvatar(
@@ -1009,7 +1025,7 @@ class MainScreenState extends State<MainScreen> {
                             thickness: 1,
                             color: Colors.grey,
                           ),
-                          const SizedBox(height: 10),
+                          const SizedBox(height: 20),
                           ElevatedButton(
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.green,
@@ -1024,12 +1040,23 @@ class MainScreenState extends State<MainScreen> {
                                   null) {
                                 saveRideRequestInformation();
                               } else {
+                                progressBarIndicator();
                                 Fluttertoast.showToast(
-                                    msg: "Please select destination ");
+                                    msg:
+                                        " Please Select Your Destination  :: ");
                               }
                             },
-                            child: Text(
-                              "Request a ride".toUpperCase(),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 30, vertical: 10),
+                              child: Text(
+                                "Request a ride".toUpperCase(),
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
                             ),
                           ),
                         ],

@@ -21,9 +21,7 @@ class _PlacePredictionTileDesignState extends State<PlacePredictionTileDesign> {
   //! Here are getPlaceDirectionDetails..
   getPlaceDirectionDetails(String placeId, context) async {
     showDialog(
-        context: context,
-        builder: (context) => const ProgressDialogWidget(
-            message: "Setting up , Drop-Off ..Wait"));
+        context: context, builder: (context) => const ProgressDialogWidget());
 
     String placeDirectionDetailsURL =
         "https://maps.googleapis.com/maps/api/place/details/json?place_id=$placeId&key=$mapKey";
@@ -57,49 +55,54 @@ class _PlacePredictionTileDesignState extends State<PlacePredictionTileDesign> {
 
   @override
   Widget build(BuildContext context) {
-    return ElevatedButton(
-      onPressed: () {
-        getPlaceDirectionDetails(widget.predictedPlaces!.placeId!, context);
-      },
-      style: ElevatedButton.styleFrom(backgroundColor: Colors.white24),
-      child: Padding(
-        padding: const EdgeInsets.all(4.0),
-        child: Row(
-          children: [
-            const Icon(
-              Icons.add_location,
-              color: Colors.grey,
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 8.0),
-                  Text(
-                    widget.predictedPlaces!.mainText!,
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 2,
-                    style: const TextStyle(
-                      fontSize: 16.0,
-                      color: Colors.white54,
-                    ),
-                  ),
-                  const SizedBox(height: 2.0),
-                  Text(
-                    widget.predictedPlaces!.secondaryText!,
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 2,
-                    style: const TextStyle(
-                      fontSize: 12.0,
-                      color: Colors.white54,
-                    ),
-                  ),
-                  const SizedBox(height: 2.0),
-                ],
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      child: ElevatedButton(
+        onPressed: () {
+          getPlaceDirectionDetails(widget.predictedPlaces!.placeId!, context);
+        },
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.blue[100],
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(4.0),
+          child: Row(
+            children: [
+              const Icon(
+                Icons.place_rounded,
+                color: Colors.black,
               ),
-            )
-          ],
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 8.0),
+                    Text(
+                      widget.predictedPlaces!.mainText!,
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 2,
+                      style: const TextStyle(
+                        fontSize: 16.0,
+                        color: Colors.black,
+                      ),
+                    ),
+                    const SizedBox(height: 2.0),
+                    Text(
+                      widget.predictedPlaces!.secondaryText!,
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 2,
+                      style: const TextStyle(
+                        fontSize: 12.0,
+                        color: Colors.black54,
+                      ),
+                    ),
+                    const SizedBox(height: 2.0),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

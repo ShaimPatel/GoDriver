@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:hexcolor/hexcolor.dart';
 import 'package:users_app/Widgets/place_prediction_tile.dart';
 import 'package:users_app/assistant/request_assistant.dart';
 import 'package:users_app/models/predicted_places.dart';
 import 'package:users_app/screens/global/map_key.dart';
+
+import '../../Widgets/progess_dialog.dart';
 
 class SearchPlacesScreen extends StatefulWidget {
   const SearchPlacesScreen({super.key});
@@ -14,6 +18,21 @@ class SearchPlacesScreen extends StatefulWidget {
 class _SearchPlacesScreenState extends State<SearchPlacesScreen> {
   //! FindPlaceAutoComplete..
   List<PredictedPlaces> placePredictedList = [];
+
+  //! Widget For Progress Bar
+  Future<void> progressBarIndicator() async {
+    showDialog(
+        context: context,
+        barrierDismissible: false,
+        barrierColor: Colors.transparent,
+        builder: (BuildContext ctx) {
+          return const ProgressDialogWidget();
+        });
+    Future.delayed(const Duration(seconds: 3), () {
+      Navigator.pop(context);
+    });
+  }
+//todo :: Find Place Auto Comlete Search -- :: --
 
   void findPlaceAutoCompleteSearch(String inputText) async {
     if (inputText.length > 1) {
@@ -38,25 +57,32 @@ class _SearchPlacesScreenState extends State<SearchPlacesScreen> {
     }
   }
 
-//! 
+//!
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: Colors.white,
       body: Column(
         children: [
           //! Search Place UI
           Container(
-            height: 180,
+            height: 190,
             width: double.infinity,
-            decoration: const BoxDecoration(color: Colors.black54, boxShadow: [
-              BoxShadow(
+            decoration: BoxDecoration(
+              color: Colors.blue[100],
+              boxShadow: const [
+                BoxShadow(
                   color: Colors.white54,
                   blurRadius: 8,
                   spreadRadius: 0.5,
-                  offset: Offset(0.7, 0.7))
-            ]),
+                  offset: Offset(
+                    0.7,
+                    0.7,
+                  ),
+                ),
+              ],
+            ),
             child: Padding(
               padding: const EdgeInsets.all(18.0),
               child: Column(
@@ -72,16 +98,16 @@ class _SearchPlacesScreenState extends State<SearchPlacesScreen> {
                         },
                         child: const Icon(
                           Icons.arrow_back,
-                          color: Colors.grey,
+                          color: Colors.black,
                         ),
                       ),
                       const Center(
                         child: Text(
-                          "Search & Set Drop of Location",
+                          "Search Destinatoion ",
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
-                            color: Colors.grey,
+                            color: Colors.black,
                           ),
                         ),
                       )
@@ -93,8 +119,9 @@ class _SearchPlacesScreenState extends State<SearchPlacesScreen> {
                   Row(
                     children: [
                       const Icon(
-                        Icons.adjust_sharp,
-                        color: Colors.white,
+                        Icons.place,
+                        color: Colors.black,
+                        size: 35,
                       ),
                       const SizedBox(width: 16.0),
                       Expanded(
@@ -104,16 +131,24 @@ class _SearchPlacesScreenState extends State<SearchPlacesScreen> {
                             onChanged: (valueTyped) {
                               findPlaceAutoCompleteSearch(valueTyped);
                             },
-                            decoration: const InputDecoration(
-                                hintText: "Search here..!",
-                                fillColor: Colors.white54,
-                                filled: true,
-                                border: InputBorder.none,
-                                contentPadding: EdgeInsets.only(
-                                  left: 11.0,
-                                  top: 8.0,
-                                  bottom: 8.0,
-                                )),
+                            textInputAction: TextInputAction.done,
+                            cursorColor: HexColor("#4f4f4f"),
+                            decoration: InputDecoration(
+                              hintText: "Search Place ..! ",
+                              fillColor: HexColor("#f0f3f1"),
+                              contentPadding:
+                                  const EdgeInsets.fromLTRB(15, 15, 15, 15),
+                              hintStyle: GoogleFonts.poppins(
+                                fontSize: 15,
+                                color: HexColor("#8d8d8d"),
+                              ),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(30),
+                                borderSide: BorderSide.none,
+                              ),
+                              prefixIconColor: HexColor("#44564a"),
+                              filled: true,
+                            ),
                           ),
                         ),
                       )
@@ -133,10 +168,15 @@ class _SearchPlacesScreenState extends State<SearchPlacesScreen> {
                     );
                   },
                   separatorBuilder: (context, index) {
-                    return const Divider(
-                      height: 1,
-                      color: Colors.grey,
-                      thickness: 1,
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 2, top: 2),
+                      child: Divider(
+                        height: 2,
+                        color: Colors.green[100],
+                        thickness: 2,
+                        indent: 15,
+                        endIndent: 15,
+                      ),
                     );
                   },
                   itemCount: placePredictedList.length,
